@@ -1,2 +1,1 @@
-# noema
-noema is a local ai that runs on ollama made for students. noema is built on personas and comes with built in tutors for your chosen subjects. noema includes a greek student mode which helps students from greece study efficiently on the messed up education department of greece. no subscriptions everything stays private.
+<img width="1056" height="4550" alt="image" src="https://github.com/user-attachments/assets/26e9ebcc-5489-4047-818d-9bf1e0f4ba20" />
