@@ -50,7 +50,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller pywebview
+          pip install pyinstaller pywebview pillow
           pip install -r requirements.txt
 
       - name: Build
