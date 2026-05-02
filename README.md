@@ -23,7 +23,7 @@ Built on [Ollama](https://ollama.com), NOEMA gives you a clean chat interface wi
 
 ## Requirements
 
-- macOS 12 or later
+- macOS 12+, Windows 10+, or Linux
 - [Ollama](https://ollama.com) installed and running
 - At least one model pulled, e.g. `ollama pull llama3`
 
@@ -31,15 +31,21 @@ Built on [Ollama](https://ollama.com), NOEMA gives you a clean chat interface wi
 
 ## Install
 
-1. Download `NOEMA.dmg` from [Releases](../../releases)
-2. Open the DMG, drag NOEMA to Applications
-3. Right-click NOEMA → Open (first launch only, to bypass Gatekeeper)
-4. Make sure Ollama is running before you start
+Download the installer for your platform from [Releases](../../releases):
+
+| Platform | File |
+|----------|------|
+| macOS | `NOEMA.dmg` — open, drag to Applications. Right-click → Open on first launch |
+| Windows | `NOEMA.exe` — run the installer |
+| Linux | `NOEMA` — make executable with `chmod +x NOEMA` and run |
+
+Make sure Ollama is running before you start.
 
 ---
 
 ## Build from Source
 
+**macOS**
 ```bash
 git clone https://github.com/theoo643/noema.git
 cd noema
@@ -47,10 +53,19 @@ pip3 install -r requirements.txt
 ./build.sh
 ```
 
-This produces `NOEMA.app` (installed to `~/Applications`) and `NOEMA.dmg` for distribution.
+**Windows**
+```bat
+pip install -r requirements.txt
+build_win.bat
+```
 
-For quick updates after editing source files:
+**Linux**
+```bash
+pip3 install -r requirements.txt
+./build_linux.sh
+```
 
+For quick updates after editing source files (macOS):
 ```bash
 ./deploy.sh index.html
 ./deploy.sh server.py
@@ -72,7 +87,7 @@ python3 app.py
 - **Frontend** — vanilla HTML/CSS/JS
 - **Backend** — Python, FastAPI, Uvicorn
 - **AI** — Ollama (local LLM)
-- **Desktop** — pywebview (WKWebView on macOS)
+- **Desktop** — pywebview
 - **Packaging** — PyInstaller
 
 ---
