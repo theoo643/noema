@@ -1,0 +1,22 @@
+# Private user data
+account.json
+threads.json
+.noema_pass
+.radahn_pass
+
+# Build artifacts
+build/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+NOEMA.app/
+NOEMA.dmg
+
+# macOS
+.DS_Store
+
+# Personal tooling
+.obsidian/
+.claude/
+graphify-out/

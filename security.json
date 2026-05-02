@@ -1,0 +1,95 @@
+{
+  "_note": "NOEMA security config. Edit freely — changes take effect immediately. The AI cannot modify this file (Layer 7).",
+
+  "shell": {
+    "_note_mode": "allowlist = only listed programs may run | denylist = anything runs unless blocked | off = no restrictions",
+    "mode": "allowlist",
+
+    "allowed_programs": [
+      "ls", "find", "cat", "echo", "pwd", "which", "whoami", "date", "env", "printenv",
+      "open", "mkdir", "mktemp", "cp", "mv", "touch", "ln",
+      "head", "tail", "grep", "awk", "sed", "tr", "cut", "wc", "sort", "uniq",
+      "du", "df", "stat", "file", "md5", "shasum",
+      "python3", "python", "pip3", "pip",
+      "ollama",
+      "brew", "npm", "node", "ruby", "perl",
+      "curl", "wget",
+      "caffeinate", "osascript", "say", "afplay",
+      "screencapture", "pbcopy", "pbpaste",
+      "defaults", "plutil", "lsregister",
+      "lsof", "ps", "top", "kill", "pkill", "killall",
+      "git", "zip", "unzip", "tar", "gzip", "gunzip", "bzip2",
+      "ssh", "scp", "rsync",
+      "ffmpeg", "convert", "identify",
+      "swift", "swiftc",
+      "xargs", "tee", "diff", "patch",
+      "mdfind", "mdls",
+      "networksetup", "ifconfig", "ping", "nslookup", "dig",
+      "diskutil", "hdiutil",
+      "security"
+    ],
+
+    "blocked_patterns": [
+      "rm -rf /", "rm -rf ~", "rm -rf $HOME", "rm -rf /*",
+      "sudo rm", "sudo dd", "sudo mkfs", "sudo chmod -R",
+      "dd if=/dev/", "mkfs",
+      ":(){:|:&};:",
+      "curl | sh", "curl | bash", "wget | sh", "wget | bash",
+      "bash <(", "sh <(",
+      "> /dev/", "| /dev/",
+      "shutdown", "reboot", "halt", "poweroff",
+      "launchctl bootout", "launchctl reboot",
+      "launchctl remove",
+      "csrutil disable",
+      "nvram -c",
+      "diskutil eraseDisk", "diskutil eraseVolume"
+    ]
+  },
+
+  "files": {
+    "_note": "Paths containing any of these fragments are always blocked.",
+    "blocked_path_fragments": [
+      ".ssh/", "/.ssh",
+      ".gnupg/", "/.gnupg",
+      ".noema_pass",
+      "/etc/passwd", "/etc/shadow", "/etc/sudoers", "/etc/master.passwd",
+      "Keychains/", "/Keychains",
+      ".aws/credentials",
+      "/.env",
+      "id_rsa", "id_ed25519", "id_ecdsa", "id_dsa",
+      ".p12", ".pfx",
+      "login.keychain", "login-db"
+    ],
+    "max_read_bytes": 524288
+  },
+
+  "sandbox": {
+    "_note": "When enabled, file tools (read/list) are restricted to these folders inside your home directory. The shell tool is not sandboxed here — that is handled by the allowlist above.",
+    "enabled": true,
+    "allowed_folders": [
+      "Documents", "Downloads", "Desktop",
+      "Pictures", "Music", "Movies", "Public"
+    ]
+  },
+
+  "screen": {
+    "_note": "Apps listed here will block screenshots when they are the frontmost window.",
+    "block_screenshot_for_apps": [
+      "1Password", "1Password 7", "Bitwarden", "LastPass", "Dashlane", "Keychain Access",
+      "System Preferences", "System Settings",
+      "SecurityAgent", "UserNotificationCenter"
+    ]
+  },
+
+  "rate_limits": {
+    "_note": "Counters reset when the server restarts. Set to 0 to disable a limit.",
+    "shell_per_minute": 20,
+    "screenshots_per_session": 30,
+    "tool_calls_per_session": 400
+  },
+
+  "self_mod_block": {
+    "_note": "Prevents the AI from modifying NOEMA's own source files via any tool.",
+    "enabled": true
+  }
+}

@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NOEMA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/flexsearch@0.7.43/dist/flexsearch.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#000;
+  --bg1:#0a0a0a;
+  --bg2:#111;
+  --bg3:#181818;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.11);
+  --text:#f0ede8;
+  --text2:#888;
+  --text3:#444;
+  --gold:#b0b0b0;
+  --gold2:#d8d8d8;
+  --glow:rgba(255,255,255,0.05);
+  --glow2:rgba(255,255,255,0.09);
+  --sidebar:260px;
+  --r:10px;
+  --r2:16px;
+  --ease:all 0.18s ease;
+}
+html,body{height:100%;overflow:hidden;font-family:"Inter",system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background 0.3s,color 0.3s}
+*:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+
+/* ── GREEK STUDENT MODE ── */
+body.greek-student{
+  --bg:#0d1520 !important;
+  --bg1:#131e30 !important;
+  --bg2:#1a2840 !important;
+  --bg3:#213252 !important;
+  --border:rgba(80,120,180,0.12) !important;
+  --border2:rgba(80,120,180,0.22) !important;
+  --text:#e8eef8 !important;
+  --text2:#7898c0 !important;
+  --text3:#3d5a80 !important;
+  --gold:#5b8ab8 !important;
+  --gold2:#7aaad4 !important;
+  --glow:rgba(91,138,184,0.08) !important;
+  --glow2:rgba(91,138,184,0.16) !important;
+}
+body.greek-student .brand-mark path,
+body.greek-student .brand-mark circle{stroke:#e8eef8}
+body.greek-student .gs-badge{display:flex!important}
+.gs-badge{
+  display:none;align-items:center;gap:5px;
+  background:#3a6fa0;color:#e8eef8;
+  font-size:10px;font-weight:700;letter-spacing:1px;
+  padding:3px 8px;border-radius:20px;
+  font-family:"Cinzel",serif;
+}
+
+/* ── LAYOUT ── */
+#app{display:flex;height:100vh;overflow:hidden;position:relative;z-index:1}
+
+/* ── SIDEBAR ── */
+.sb{
+  width:var(--sidebar);flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:var(--bg1);
+  border-right:1px solid var(--border);
+  overflow:hidden;
+}
+.sb-top{padding:16px 14px 0}
+.brand{display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.brand-mark{width:28px;height:28px;flex-shrink:0}
+.brand-name{font-family:"Cinzel",serif;font-size:15px;font-weight:800;letter-spacing:5px;color:#fff}
+
+.new-btn{
+  width:100%;display:flex;align-items:center;gap:8px;
+  padding:9px 12px;background:transparent;
+  border:1px solid var(--border2);border-radius:var(--r);
+  color:var(--text2);font:500 13px "Inter",sans-serif;
+  cursor:pointer;transition:var(--ease);margin-bottom:8px;
+}
+.new-btn:hover{background:var(--bg2);color:var(--text);border-color:var(--border2)}
+
+.frag{
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:10px 12px;cursor:pointer;transition:var(--ease);
+  position:relative;overflow:hidden;
+}
+.frag::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.4}
+.frag:hover{border-color:var(--border2);background:var(--bg2)}
+.frag-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-family:"Cinzel",serif;margin-bottom:4px}
+.frag-name{font-size:13.5px;font-weight:500;color:var(--text)}
+.frag-brand{font-size:11px;color:var(--text2);font-style:italic;margin-top:1px}
+.frag-notes{font-size:10px;color:var(--text3);margin-top:5px;letter-spacing:.2px}
+
+.subj-bar{display:flex;gap:5px;padding:0 8px 10px;overflow-x:auto;flex-shrink:0}
+.subj-bar::-webkit-scrollbar{display:none}
+.subj-btn{flex-shrink:0;padding:5px 11px;background:transparent;border:1px solid var(--border);border-radius:20px;color:var(--text3);font:600 10px "Inter",sans-serif;letter-spacing:.4px;cursor:pointer;transition:var(--ease);white-space:nowrap}
+.subj-btn:hover{color:var(--gold);border-color:var(--gold);background:var(--glow)}
+.subj-btn.on{color:var(--gold);border-color:var(--gold);background:var(--glow2)}
+.threads-hd{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);padding:14px 14px 5px;font-family:"Cinzel",serif}
+.threads{flex:1;min-height:0;overflow-y:auto;padding:0 6px 8px}
+.threads::-webkit-scrollbar{width:3px}
+.threads::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+.thread{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;transition:var(--ease);position:relative}
+.thread:hover{background:var(--bg2);color:var(--text)}
+.thread.on{background:var(--bg2);color:var(--text)}
+.thread.on::before{content:"";position:absolute;left:0;top:18%;bottom:18%;width:3px;background:var(--gold);border-radius:2px;box-shadow:0 0 6px var(--glow2)}
+.t-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-inp{flex:1;background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--text);font:13px "Inter",sans-serif;outline:none}
+.t-del{background:none;border:none;color:var(--text3);cursor:pointer;opacity:0;padding:2px 6px;font-size:13px;border-radius:4px;transition:var(--ease)}
+.thread:hover .t-del{opacity:1}
+.t-del:hover{color:var(--gold)}
+
+.sb-foot{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;background:transparent;border:1px solid var(--border);color:var(--text2);font:12px "Inter",sans-serif;border-radius:8px;cursor:pointer;transition:var(--ease)}
+.sb-btn:hover{color:var(--gold);border-color:var(--gold);background:var(--glow)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+
+/* topbar */
+.topbar{display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--border);background:rgba(0,0,0,.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-shrink:0}
+.tb-l{display:flex;align-items:center;gap:8px}
+.mdl-sel{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font:13px "Inter",sans-serif;padding:5px 10px;border-radius:7px;cursor:pointer;outline:none;transition:var(--ease)}
+.mdl-sel:hover{border-color:var(--gold)}
+.mdl-sel option{background:var(--bg1)}
+.tb-c{flex:1;text-align:center}
+.tb-title{font-family:"Cinzel",serif;font-size:13px;font-weight:800;letter-spacing:6px;color:#fff}
+.tb-sub{font-size:10px;color:var(--text3);letter-spacing:.8px;margin-top:1px;font-style:italic}
+.tb-r{display:flex;align-items:center;gap:7px}
+.tb-btn{background:transparent;border:1px solid var(--border);color:var(--text2);font:12px "Inter",sans-serif;padding:5px 12px;border-radius:7px;cursor:pointer;transition:var(--ease)}
+.tb-btn:hover{color:var(--gold);border-color:var(--gold)}
+.ollama-err{border-color:rgba(220,80,80,.5)!important;color:#dc5050!important}
+.p-chip{display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--glow);border:1px solid var(--border2);border-radius:20px;font-size:11px;color:var(--text2);cursor:pointer;transition:var(--ease)}
+.p-chip:hover{background:var(--glow2)}
+
+/* messages */
+.msgs{flex:1;overflow-y:auto;padding:32px 0}
+.msgs::-webkit-scrollbar{width:5px}
+.msgs::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+.msgs-in{max-width:720px;margin:0 auto;padding:0 24px;display:flex;flex-direction:column;gap:4px}
+
+/* empty */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:62vh;gap:22px;text-align:center;padding:40px 24px}
+.empty-icon{width:72px;height:72px;animation:iconPulse 4s ease-in-out infinite}
+@keyframes iconPulse{0%,100%{opacity:.45}50%{opacity:.9}}
+.empty-q{font-size:20px;color:var(--text2);font-style:italic;max-width:480px;line-height:1.65;font-weight:300;letter-spacing:.1px}
+.empty-tag{font-family:"Cinzel",serif;font-size:9px;letter-spacing:4px;color:var(--text3);text-transform:uppercase}
+
+/* messages */
+.msg{display:flex;flex-direction:column;gap:3px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.msg.user{align-items:flex-end}
+.msg.ai{align-items:flex-start}
+.msg-who{font-size:10px;letter-spacing:2px;color:var(--text3);font-family:"Cinzel",serif;text-transform:uppercase;padding:0 4px}
+.msg-imgs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.msg-imgs img{max-width:200px;max-height:200px;border-radius:10px;border:1px solid var(--border2);object-fit:cover}
+.bubble{padding:13px 17px;font-size:15px;line-height:1.7;border-radius:var(--r2);border:1px solid var(--border);max-width:100%;word-wrap:break-word;white-space:pre-wrap}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:6px 0;margin:6px 0}
+.katex{color:var(--text);font-size:1.05em}
+.msg.user .bubble{background:var(--bg2);border-color:var(--border2);border-bottom-right-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
+.msg.ai .bubble{background:var(--bg1);border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+.msg-acts{display:flex;gap:4px;padding:2px 4px;opacity:0;transition:opacity .2s}
+.msg:hover .msg-acts{opacity:1}
+.mact{background:none;border:none;color:var(--text3);font:11px "Inter",sans-serif;cursor:pointer;padding:3px 8px;border-radius:5px;transition:var(--ease)}
+.mact:hover{color:var(--gold);background:var(--glow)}
+
+/* thinking */
+.think{border:1px dashed var(--border2);border-radius:10px;padding:8px 12px;cursor:pointer;margin-bottom:6px}
+.think-hd{display:flex;justify-content:space-between;align-items:center;font-family:"Cinzel",serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:3px}
+.think-body{max-height:0;overflow:hidden;transition:max-height .3s ease;font-size:12px;color:var(--text3);white-space:pre-wrap;line-height:1.5}
+.think.open .think-body{max-height:300px;overflow-y:auto}
+
+/* typing */
+.dots{display:inline-flex;gap:5px;padding:5px 0}
+.dots span{width:6px;height:6px;border-radius:50%;background:var(--gold);opacity:.35;animation:dt 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.16s}
+.dots span:nth-child(3){animation-delay:.32s}
+@keyframes dt{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* ── COMPOSER ── */
+.comp-outer{flex-shrink:0;border-top:1px solid var(--border);background:rgba(0,0,0,.4);padding:12px 24px 18px;display:flex;justify-content:center}
+.comp-inner{width:100%;max-width:720px}
+.img-prev{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.img-prev:empty{display:none}
+.ipw{position:relative}
+.ipw img{width:58px;height:58px;border-radius:8px;object-fit:cover;border:1px solid var(--border2)}
+.ip-rm{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;background:var(--bg2);border:1px solid var(--border2);color:var(--text2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease)}
+.ip-rm:hover{background:var(--bg3);color:var(--text)}
+.comp-box{display:flex;align-items:flex-end;gap:6px;background:var(--bg1);border:1px solid var(--border2);border-radius:var(--r2);padding:8px 8px 8px 16px;transition:border-color .2s,box-shadow .2s}
+.comp-box:focus-within{border-color:var(--gold);box-shadow:0 0 0 1px var(--glow2)}
+.comp-ta{flex:1;background:transparent;border:none;color:var(--text);font:15px "Inter",sans-serif;resize:none;outline:none;padding:7px 0;min-height:22px;max-height:200px;line-height:1.5}
+.comp-ta::placeholder{color:var(--text3)}
+.cb{background:transparent;border:none;color:var(--text3);cursor:pointer;padding:8px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0}
+.cb:hover{color:var(--gold);background:var(--glow)}
+.cb.on{color:var(--gold);animation:recP 1s ease-in-out infinite}
+@keyframes recP{50%{opacity:.4}}
+.send{background:var(--gold);border:none;color:var(--bg);width:36px;height:36px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease);flex-shrink:0}
+.send:hover{filter:brightness(1.12);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,0.4)}
+.send:disabled{opacity:.25;cursor:not-allowed;transform:none;filter:none;box-shadow:none}
+.comp-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:7px}
+
+
+/* ── MODAL ── */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(14px);z-index:100;display:none;align-items:center;justify-content:center}
+.ovl.open{display:flex;animation:fin .2s ease}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+.modal{background:var(--bg1);border:1px solid var(--border2);border-radius:var(--r2);padding:28px;width:92%;max-width:520px;max-height:82vh;overflow-y:auto;box-shadow:0 32px 100px rgba(0,0,0,.8),0 0 0 1px var(--border);color:var(--text)}
+.modal h2{font-family:"Cinzel",serif;font-size:17px;letter-spacing:3px;font-weight:700;margin-bottom:20px;text-transform:uppercase;color:#fff}
+.modal h3{font-family:"Cinzel",serif;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin:18px 0 8px}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.mrow:last-of-type{border:none}
+.mrow label{font-size:13px;color:var(--text2)}
+.mcls{background:transparent;border:1px solid var(--border2);color:var(--text2);padding:9px 20px;border-radius:8px;font:13px "Inter",sans-serif;cursor:pointer;margin-top:14px;transition:var(--ease)}
+.mcls:hover{color:var(--gold);border-color:var(--gold);background:var(--glow)}
+.msel{background:var(--bg2);border:1px solid var(--border);color:var(--text);font:13px "Inter",sans-serif;padding:5px 10px;border-radius:7px;cursor:pointer;outline:none}
+.msel option{background:var(--bg1)}
+
+/* toggle */
+.tog{width:38px;height:21px;background:var(--bg3);border:1px solid var(--border2);border-radius:11px;cursor:pointer;flex-shrink:0;position:relative;transition:background .2s}
+.tog.on{background:var(--gold);border-color:var(--gold)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:transform .2s}
+.tog.on::after{transform:translateX(17px)}
+
+/* persona create form */
+.pform{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.pform input,.pform textarea{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font:13px "Inter",sans-serif;outline:none;transition:border-color .2s}
+.pform input:focus,.pform textarea:focus{border-color:var(--gold);outline:none}
+.pform textarea{min-height:80px;resize:vertical}
+
+/* toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:11px 22px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:10px;font-size:13px;z-index:200;display:none;max-width:78vw;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.show{display:block;animation:fin .2s ease}
+
+/* ── AUTH SCREEN ── */
+.auth-screen{
+  position:fixed;inset:0;z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+.auth-card{
+  width:100%;max-width:400px;
+  padding:44px 40px 36px;
+  background:var(--bg1);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  box-shadow:0 32px 80px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;align-items:center;
+  animation:fin .3s ease;
+}
+.auth-sigil{
+  width:52px;height:52px;margin-bottom:18px;
+  filter:drop-shadow(0 0 16px rgba(180,180,180,.2));
+}
+.auth-logo{
+  font-family:"Cinzel",serif;font-size:22px;font-weight:800;letter-spacing:7px;
+  color:#fff;
+  margin-bottom:4px;
+}
+.auth-tagline{font-size:12px;color:var(--text3);letter-spacing:.5px;margin-bottom:28px}
+.auth-fields{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
+.auth-field{position:relative;width:100%}
+.auth-field-label{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:13px;color:var(--text3);pointer-events:none;
+  transition:all .18s ease;z-index:1;
+}
+.auth-field input:focus ~ .auth-field-label,
+.auth-field input:not(:placeholder-shown) ~ .auth-field-label{
+  top:7px;transform:none;font-size:10px;color:var(--gold);letter-spacing:.5px;
+}
+.auth-field input{
+  width:100%;background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--text);padding:22px 13px 8px;
+  border-radius:10px;font:14px "Inter",sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.auth-field input::placeholder{opacity:0}
+.auth-field input:focus{border-color:var(--gold)}
+.auth-submit{
+  width:100%;margin-top:14px;
+  background:rgba(255,255,255,0.1);border:1px solid var(--border2);color:var(--text);
+  padding:12px;border-radius:10px;
+  font:600 14px "Inter",sans-serif;cursor:pointer;
+  transition:var(--ease);letter-spacing:.3px;
+}
+.auth-submit:hover{background:rgba(255,255,255,0.18);transform:translateY(-1px)}
+.auth-submit:active{transform:none}
+.auth-err{font-size:12px;color:#e06040;margin-top:10px;min-height:16px;text-align:center}
+
+/* ── QUIZ ── */
+.quiz-ovl{position:fixed;inset:0;z-index:450;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg)}
+.quiz-skip{position:absolute;top:22px;right:26px;background:none;border:none;color:var(--text3);font:13px "Inter",sans-serif;cursor:pointer;transition:var(--ease);letter-spacing:.2px}
+.quiz-skip:hover{color:var(--text)}
+.quiz-inner{width:100%;max-width:540px;padding:0 24px;text-align:center;transition:opacity .25s}
+.quiz-sigil{margin:0 auto 22px;display:block;filter:drop-shadow(0 0 14px rgba(180,180,180,.2))}
+.quiz-step{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-family:"Cinzel",serif;margin-bottom:12px}
+.quiz-q{font-family:"Cinzel",serif;font-size:19px;font-weight:700;color:var(--text);margin-bottom:28px;line-height:1.5;letter-spacing:.5px}
+.quiz-opts{display:flex;flex-direction:column;gap:9px;text-align:left}
+.quiz-opt{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:14px 18px;cursor:pointer;transition:all .2s;color:var(--text2);width:100%}
+.quiz-opt:hover{border-color:var(--gold);background:var(--bg2);color:var(--text);transform:translateX(5px);box-shadow:0 2px 10px rgba(0,0,0,0.2)}
+.quiz-opt-label{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px;text-align:left}
+.quiz-opt-sub{font-size:11.5px;color:var(--text3);line-height:1.4;text-align:left}
+.quiz-dots{display:flex;gap:8px;margin-top:30px;justify-content:center}
+.quiz-dot{width:6px;height:6px;border-radius:3px;background:var(--bg3);transition:all .3s}
+.quiz-dot.on{background:var(--gold);width:22px}
+.quiz-done-btn{margin:0 auto;max-width:200px;display:block}
+
+/* ── EXAM QUIZ ── */
+.eq-modal{position:fixed;inset:0;z-index:460;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+.eq-header{display:flex;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
+.eq-title{font:700 12px "Cinzel",serif;color:var(--text);letter-spacing:.7px;flex:1}
+.eq-score{font:700 13px "Inter",sans-serif;color:var(--gold);letter-spacing:.3px;background:var(--glow);border:1px solid var(--border2);padding:3px 10px;border-radius:20px}
+.eq-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:4px;transition:var(--ease)}
+.eq-close:hover{color:var(--text)}
+.eq-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;padding:40px 24px}
+.eq-inner{width:100%;max-width:560px}
+.eq-pick-title{font:700 20px "Cinzel",serif;color:var(--text);margin-bottom:8px;text-align:center;letter-spacing:.5px}
+.eq-pick-sub{font:13px "Inter",sans-serif;color:var(--text3);text-align:center;margin-bottom:32px;line-height:1.6}
+.eq-subj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.eq-subj-btn{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:20px 12px;cursor:pointer;transition:all .18s;text-align:center}
+.eq-subj-btn:hover{border-color:var(--gold);background:var(--bg2);transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.eq-subj-ico{font-size:22px;margin-bottom:9px;color:var(--text2)}
+.eq-subj-name{font:700 11.5px "Cinzel",serif;color:var(--text);letter-spacing:.4px}
+.eq-qnum{font:600 9px "Cinzel",serif;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.eq-qtext{font:400 15.5px "Inter",sans-serif;color:var(--text);line-height:1.75;margin-bottom:24px;white-space:pre-wrap;min-height:40px}
+.eq-ans-wrap{display:flex;flex-direction:column;gap:10px}
+.eq-ans{width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font:14px "Inter",sans-serif;resize:none;outline:none;transition:border-color .2s;line-height:1.55;min-height:72px;box-sizing:border-box}
+.eq-ans:focus{border-color:var(--gold)}
+.eq-submit{padding:10px 26px;background:var(--gold);color:var(--bg);border:none;border-radius:8px;font:700 12.5px "Inter",sans-serif;cursor:pointer;transition:var(--ease);letter-spacing:.3px;align-self:flex-end}
+.eq-submit:hover{opacity:.85;transform:translateY(-1px)}
+.eq-submit:disabled{opacity:.38;cursor:default;transform:none}
+.eq-result{margin-top:22px;padding:16px 18px;border-radius:12px;border:1px solid var(--border)}
+.eq-result.correct{border-color:rgba(74,200,130,.35);background:rgba(74,200,130,.06)}
+.eq-result.wrong{border-color:rgba(220,80,80,.35);background:rgba(220,80,80,.06)}
+.eq-verdict{font:700 13px "Cinzel",serif;letter-spacing:.5px;margin-bottom:8px}
+.eq-result.correct .eq-verdict{color:#4ac882}
+.eq-result.wrong .eq-verdict{color:#dc5050}
+.eq-explanation{font:13px "Inter",sans-serif;color:var(--text2);line-height:1.65;white-space:pre-wrap}
+.eq-next{margin-top:20px;width:100%;padding:11px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;font:700 12.5px "Cinzel",serif;color:var(--text);cursor:pointer;transition:var(--ease);letter-spacing:.4px}
+.eq-next:hover{border-color:var(--gold);color:var(--gold)}
+.eq-change{display:block;margin:10px auto 0;background:none;border:none;color:var(--text3);font:12px "Inter",sans-serif;cursor:pointer;padding:4px 8px;transition:var(--ease)}
+.eq-change:hover{color:var(--text2)}
+.eq-grade-group{margin-bottom:22px}
+.eq-grade-group-lbl{font:600 9px "Cinzel",serif;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.eq-grade-pills{display:flex;gap:8px;flex-wrap:wrap}
+.eq-grade-pill{background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:10px 20px;cursor:pointer;font:700 13px "Cinzel",serif;color:var(--text2);transition:all .18s;letter-spacing:.5px}
+.eq-grade-pill:hover{border-color:var(--gold);color:var(--gold);background:var(--glow)}
+.eq-grade-change{background:none;border:none;color:var(--text3);font:11px "Inter",sans-serif;cursor:pointer;padding:1px 5px;margin-left:4px;transition:var(--ease);vertical-align:middle}
+.eq-grade-change:hover{color:var(--text2)}
+.eq-context-tag{display:inline-flex;align-items:center;gap:4px;background:var(--glow);border:1px solid var(--border2);border-radius:6px;padding:3px 9px;font:11px "Inter",sans-serif;color:var(--text3);margin-top:8px}
+
+/* ── SIDEBAR PERSONA ── */
+.sb-persona{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 6px 6px;border-radius:10px;cursor:pointer;border:1px solid var(--border);transition:var(--ease)}
+.sb-persona:hover{border-color:var(--border2);background:var(--bg2)}
+.sb-persona.lit{border-color:var(--border2);background:var(--bg2)}
+.sb-persona-av{width:30px;height:30px;border-radius:8px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font:700 12px "Cinzel",serif;color:var(--text2);flex-shrink:0;letter-spacing:0}
+.sb-persona-info{flex:1;min-width:0}
+.sb-persona-name{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-persona-desc{font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.sb-persona-arr{color:var(--text3);flex-shrink:0;opacity:.5}
+
+/* Thread persona badge */
+.t-pid{font-size:9px;padding:1px 5px;border-radius:3px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);white-space:nowrap;flex-shrink:0;font-family:"Cinzel",serif;letter-spacing:.5px}
+
+/* Persona card grid in modal */
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.pc{padding:12px 14px;border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:var(--ease);position:relative;text-align:left}
+.pc:hover{border-color:var(--border2);background:var(--bg2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.25)}
+.pc.on{border-color:var(--gold);background:var(--glow);box-shadow:0 0 0 1px var(--glow2)}
+.pc-av{width:28px;height:28px;border-radius:7px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font:700 11px "Cinzel",serif;color:var(--text2);margin-bottom:8px}
+.pc-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
+.pc-desc{font-size:11px;color:var(--text3);line-height:1.4}
+.pc-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 5px;transition:var(--ease);border-radius:4px}
+.pc-del:hover{color:var(--gold);background:var(--bg3)}
+
+/* About Me / User Context */
+.about-ta{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font:13px "Inter",sans-serif;outline:none;resize:vertical;min-height:64px;transition:border-color .2s;box-sizing:border-box}
+.about-ta:focus{border-color:var(--gold)}
+.about-hint{font-size:10.5px;color:var(--text3);margin-top:5px;line-height:1.5}
+.ctx-preview{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:10.5px;color:var(--text3);font-style:italic;line-height:1.6;margin-top:10px}
+
+/* ── GENERATION STATUS BAR ── */
+.gen-bar{display:none;align-items:center;gap:9px;padding:7px 14px;border-top:1px solid var(--border);background:var(--bg);font-size:12px;color:var(--text3)}
+.gen-bar.on{display:flex;animation:fin .2s ease}
+.gen-pulse{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:dt 1s ease-in-out infinite;opacity:.85}
+#genPhase{flex:1;font-size:12px}
+.gen-secs{font-variant-numeric:tabular-nums;font-size:10.5px;letter-spacing:.3px;color:var(--text3)}
+.gen-stop{background:none;border:1px solid var(--border2);color:var(--text2);font:500 11px "Inter",sans-serif;padding:4px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0;transition:var(--ease)}
+.gen-stop:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── KILL LEVEL MODAL ── */
+.kill-opts{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.kill-opt{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:var(--ease);background:var(--bg)}
+.kill-opt:hover{border-color:var(--border2);background:var(--bg2)}
+.kill-opt-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.kill-opt-body{flex:1}
+.kill-opt-name{font-weight:600;font-size:14px;margin-bottom:2px}
+.kill-opt-desc{font-size:12px;color:var(--text3);line-height:1.5}
+.kill-opt.pause .kill-opt-name{color:var(--text)}
+.kill-opt.pause:hover{border-color:var(--border2)}
+.kill-opt.kill-l .kill-opt-name{color:#f59e0b}
+.kill-opt.kill-l:hover{border-color:rgba(245,158,11,.4)}
+.kill-opt.nuke .kill-opt-name{color:#f06060}
+.kill-opt.nuke:hover{border-color:rgba(240,96,96,.4)}
+
+/* ── TOOL CALL BUBBLES ── */
+.tool-call{
+  align-self:flex-start;
+  display:flex;align-items:center;gap:9px;
+  padding:8px 14px;border:1px solid var(--border);
+  border-radius:10px;background:var(--bg1);
+  font-size:12px;color:var(--text2);
+  animation:msgIn .3s ease;max-width:85%;
+}
+.tool-call .tc-icon{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.tool-call .tc-name{color:var(--gold);font-weight:500;font-size:11px;letter-spacing:.5px}
+.tool-call .tc-args{color:var(--text3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.tool-call.done{opacity:.55}
+
+/* ── SEARCH ── */
+.search-wrap{padding:0 6px 5px}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;transition:border-color .2s}
+.search-box:focus-within{border-color:var(--border2)}
+.search-ico{flex-shrink:0;color:var(--text3)}
+.search-inp{flex:1;background:transparent;border:none;color:var(--text);font:13px "Inter",sans-serif;outline:none;min-width:0}
+.search-inp::placeholder{color:var(--text3)}
+.search-clear{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;line-height:1;padding:0 2px;transition:color .15s;flex-shrink:0}
+.search-clear:hover{color:var(--gold)}
+.sr-item{padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border)}
+.sr-item:last-child{border-bottom:none}
+.sr-item:hover{background:var(--bg2)}
+.sr-thread{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-family:"Cinzel",serif;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sr-snippet{font-size:12px;color:var(--text2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sr-snippet mark{background:rgba(255,255,255,.12);color:var(--text);border-radius:2px;padding:0 2px;font-style:normal}
+.sr-empty{padding:24px 12px;text-align:center;font-size:12px;color:var(--text3);font-style:italic}
+.sr-hl{outline:1.5px solid var(--gold)!important;outline-offset:4px;border-radius:var(--r2);transition:outline .4s}
+
+/* ── WALKTHROUGH ── */
+.wt-ovl{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.wt-modal{width:92%;max-width:520px;background:var(--bg1);border:1px solid var(--border2);border-radius:20px;box-shadow:0 32px 80px rgba(0,0,0,.65);position:relative;overflow:hidden;animation:fin .28s ease}
+.wt-skip{position:absolute;top:14px;right:16px;z-index:2;background:none;border:none;color:var(--text3);font:12px "Inter",sans-serif;cursor:pointer;padding:4px 10px;border-radius:6px;transition:color .15s;letter-spacing:.2px}
+.wt-skip:hover{color:var(--text2)}
+.wt-viewport{overflow:hidden}
+.wt-track{display:flex;width:500%;transition:transform .26s cubic-bezier(.4,0,.2,1)}
+.wt-card{width:20%;padding:44px 40px 28px;flex-shrink:0;box-sizing:border-box}
+.wt-card-num{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--text3);font-family:"Cinzel",serif;margin-bottom:20px}
+.wt-sigil{width:44px;height:44px;margin-bottom:20px;filter:drop-shadow(0 0 14px rgba(180,180,180,.2))}
+.wt-card-h{font-family:"Cinzel",serif;font-size:21px;font-weight:700;letter-spacing:2px;margin-bottom:13px;color:#fff}
+.wt-card.wt-warn .wt-card-h{background:linear-gradient(135deg,#fff 10%,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wt-card-body{font-size:14.5px;color:var(--text2);line-height:1.72}
+.wt-card-sub{margin-top:11px;font-size:12.5px;color:var(--text3);line-height:1.65}
+.wt-pill{display:inline-flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:4px 10px;font-size:11.5px;color:var(--text2);white-space:nowrap;vertical-align:middle}
+.wt-warn-box{display:flex;align-items:flex-start;gap:10px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);border-radius:10px;padding:13px 16px;margin-top:16px}
+.wt-warn-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#f59e0b;margin-bottom:6px}
+.wt-kbd{display:inline-flex;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-size:12px;color:var(--text);font-family:"Inter",monospace;min-width:24px}
+.wt-try-box{margin-top:16px;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:16px 18px}
+.wt-try-q{font-size:13px;color:var(--text);line-height:1.65;font-style:italic}
+.wt-try-hint{font-size:11px;color:var(--text3);margin-top:7px;line-height:1.5}
+.wt-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 24px 20px;border-top:1px solid var(--border)}
+.wt-dots{display:flex;gap:6px;align-items:center}
+.wt-dot{width:6px;height:6px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;transition:all .22s ease;padding:0;flex-shrink:0}
+.wt-dot.on{width:18px;border-radius:3px;background:var(--gold);border-color:var(--gold)}
+.wt-nav{background:transparent;border:1px solid var(--border2);color:var(--text2);font:500 12px "Inter",sans-serif;padding:7px 15px;border-radius:8px;cursor:pointer;transition:var(--ease);letter-spacing:.2px}
+.wt-nav:hover{color:var(--text);border-color:var(--border2)}
+.wt-nav:disabled{opacity:.3;cursor:not-allowed}
+.wt-next{background:rgba(255,255,255,0.12)!important;border-color:var(--border2)!important;color:var(--text)!important;font-weight:600!important}
+.wt-next:hover{background:rgba(255,255,255,0.2)!important;border-color:var(--border2)!important}
+
+/* ── REMOTE URL BADGE ── */
+.remote-badge{
+  display:none;align-items:center;gap:7px;
+  padding:5px 12px;background:var(--bg2);
+  border:1px solid var(--border2);border-radius:20px;
+  font-size:11px;color:var(--text2);cursor:pointer;
+}
+.remote-badge.show{display:flex}
+.remote-badge:hover{background:var(--glow2)}
+
+/* ── AUDIT LOG ── */
+#auditModal{align-items:stretch;justify-content:flex-end}
+.audit-panel{width:640px;max-width:100vw;height:100vh;background:var(--bg1);border-left:1px solid var(--border2);display:flex;flex-direction:column;animation:slideInRight .22s ease;overflow:hidden}
+@keyframes slideInRight{from{transform:translateX(100%)}to{transform:none}}
+.audit-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.audit-filters{padding:10px 16px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
+.af-row{display:flex;flex-wrap:wrap;gap:5px}
+.af-pill{background:var(--bg2);border:1px solid var(--border);color:var(--text3);font:500 11px "Inter",sans-serif;padding:4px 10px;border-radius:20px;cursor:pointer;transition:var(--ease);white-space:nowrap}
+.af-pill:hover{border-color:var(--border2);color:var(--text)}
+.af-pill.on{border-color:var(--gold);color:var(--gold);background:var(--glow)}
+.audit-body{flex:1;overflow-y:auto;padding:8px}
+.audit-body::-webkit-scrollbar{width:3px}
+.audit-body::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:2px}
+.audit-footer{padding:8px 16px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);flex-shrink:0}
+.audit-empty{padding:32px 16px;text-align:center;font-size:13px;color:var(--text3)}
+.audit-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);font-family:"Inter",sans-serif}
+.audit-live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);animation:auditPulse 1.8s ease-in-out infinite}
+@keyframes auditPulse{0%,100%{opacity:.3}50%{opacity:1}}
+/* Entry rows */
+.ae{border-left:3px solid transparent;border-radius:6px;margin-bottom:3px;cursor:default;transition:background .15s}
+.ae:hover{background:var(--bg2)}
+.ae.risk{border-left-color:#f59e0b}
+.ae.denied{border-left-color:#f06060}
+.ae.fail{opacity:.6}
+.ae-main{display:flex;align-items:flex-start;gap:10px;padding:9px 10px}
+.ae-badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.ae-shell{background:rgba(80,130,220,.15);color:#7aabf5}
+.ae-file{background:rgba(200,200,200,.1);color:var(--gold)}
+.ae-web{background:rgba(60,180,160,.12);color:#5ecfc0}
+.ae-app{background:rgba(80,200,100,.12);color:#7ae08a}
+.ae-screen{background:rgba(220,140,50,.12);color:#f5a850}
+.ae-session{background:rgba(160,80,200,.12);color:#c07af0}
+.ae-kill{background:rgba(220,60,60,.15);color:#f07a7a}
+.ae-default{background:var(--bg2);color:var(--text3)}
+.ae-right{flex:1;min-width:0}
+.ae-ts{font-size:10px;color:var(--text3);margin-bottom:1px;font-variant-numeric:tabular-nums}
+.ae-detail{font-size:12px;color:var(--text2);word-break:break-all;line-height:1.4}
+.ae-denied{font-size:10px;color:#f07a7a;font-weight:600;margin-top:2px}
+.ae-chevron{color:var(--text3);font-size:14px;flex-shrink:0;transition:transform .2s;cursor:pointer;padding:2px 4px;margin-top:1px}
+.ae.expanded .ae-chevron{transform:rotate(90deg)}
+.ae-detail-extra{display:none;font-size:11px;color:var(--text3);margin:0 10px 8px 10px;padding:8px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border);white-space:pre-wrap;line-height:1.5;word-break:break-all}
+.ae.expanded .ae-detail-extra{display:block}
+</style>
+</head>
+<body data-lang="en">
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sb">
+    <div class="sb-top">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 21V7L21 21V7" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="14" cy="14" r="1.6" fill="rgba(255,255,255,0.85)"/>
+        </svg>
+        <span class="brand-name">NOEMA</span>
+      </div>
+
+      <button class="new-btn" id="newBtn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span data-i18n="newChat">New chat</span>
+      </button>
+
+      <div class="subj-bar" id="subjBar">
+        <button class="subj-btn" data-pid="math"    data-en="Math"  data-gr="Μαθ">Μαθ</button>
+        <button class="subj-btn" data-pid="physics" data-en="Phys"  data-gr="Φυσ">Φυσ</button>
+        <button class="subj-btn" data-pid="chem"    data-en="Chem"  data-gr="Χημ">Χημ</button>
+        <button class="subj-btn" data-pid="history" data-en="Hist"  data-gr="Ιστ">Ιστ</button>
+        <button class="subj-btn" data-pid="essay"   data-en="Essay" data-gr="Έκθ">Έκθ</button>
+        <button class="subj-btn" data-pid="greek"   data-en="Eng"   data-gr="Αγγ">Αγγ</button>
+        <button class="subj-btn" data-pid="hw"      data-en="HW"    data-gr="Εργ">Εργ</button>
+        <button class="subj-btn" id="examTrigger" data-en="Quiz" data-gr="Κουίζ" style="border-color:var(--gold);color:var(--gold)">Κουίζ</button>
+      </div>
+
+      <div class="frag" id="fragCard">
+        <div class="frag-label" data-i18n="wordofday">Word of the day</div>
+        <div class="frag-name" id="fN">—</div>
+        <div class="frag-brand" id="fB">—</div>
+        <div class="frag-notes" id="fNt">—</div>
+      </div>
+    </div>
+
+    <!-- Active Persona -->
+    <div class="sb-persona" id="sbPersona">
+      <div class="sb-persona-av" id="sbPersonaAv">N</div>
+      <div class="sb-persona-info">
+        <div class="sb-persona-name" id="sbPersonaName">NOEMA</div>
+        <div class="sb-persona-desc" id="sbPersonaDesc">Your personal intelligence</div>
+      </div>
+      <svg class="sb-persona-arr" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <div class="search-box">
+        <svg class="search-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" class="search-inp" type="text" placeholder="Search chats…" autocomplete="off" spellcheck="false"/>
+        <button id="searchClear" class="search-clear" style="display:none" aria-label="Clear search">×</button>
+      </div>
+    </div>
+
+    <div class="threads-hd" data-i18n="chats">Conversations</div>
+    <div class="threads" id="threads"></div>
+
+    <div class="sb-foot">
+        <button class="sb-btn" id="settingsBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span data-i18n="settings">Settings</span>
+        </button>
+        <button class="sb-btn" id="auditBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span data-i18n="auditLog">Audit Log</span>
+        </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" style="position:relative">
+    <div class="topbar">
+      <div class="tb-l" style="gap:5px">
+        <select class="mdl-sel" id="modelSel"></select>
+        <button class="tb-btn" id="modelRefresh" title="Reload models" style="padding:5px 8px;font-size:14px">⟳</button>
+      </div>
+      <div class="tb-c">
+        <div class="tb-title">NOEMA</div>
+        <div class="gs-badge" id="gsBadge">ΜΑΘΗΤΗΣ</div>
+        <div class="tb-sub" id="sub"></div>
+      </div>
+      <div class="tb-r">
+        <div class="remote-badge" id="remoteBadge" title="Your phone URL — click to copy">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+          <span id="remoteBadgeText">Phone</span>
+        </div>
+        <div class="p-chip" id="pChip" style="display:none"></div>
+        <button class="tb-btn" id="greekStudentBtn" title="Ελληνικός Μαθητής" style="color:#4a9eff;font-weight:700;font-size:11px;padding:4px 8px;letter-spacing:.3px"><span id="gsBtnLabel">ΕΛ ΜΑΘΗΤΗΣ</span></button>
+        <button class="tb-btn" id="exportBtn" title="Export conversation" style="padding:5px 8px;font-size:13px">⤓</button>
+        <button class="tb-btn" title="Reload app" onclick="location.href='/?v='+Date.now()" style="padding:5px 8px;font-size:14px">↺</button>
+        <button class="tb-btn" id="langBtn">EN</button>
+      </div>
+    </div>
+
+    <div class="msgs" id="msgs"><div class="msgs-in" id="msgsIn"></div></div>
+
+    <div class="comp-outer">
+      <!-- Generation status bar -->
+      <div class="gen-bar" id="genBar">
+        <span class="gen-pulse"></span>
+        <span id="genPhase">Thinking…</span>
+        <span class="gen-secs" id="genSecs"></span>
+        <button class="gen-stop" id="killBtn" title="Stop (Escape) · Cmd+Shift+Esc for more options">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          Stop
+        </button>
+      </div>
+      <div class="comp-inner">
+        <div class="img-prev" id="imgPrev"></div>
+        <div class="comp-box">
+          <textarea class="comp-ta" id="input" rows="1" placeholder="Ask NOEMA anything..."></textarea>
+          <input type="file" id="fileIn" accept="image/*" multiple style="display:none"/>
+          <button class="cb" id="imgBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </button>
+          <button class="cb" id="micBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </button>
+          <button class="send" id="sendBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="comp-hint" data-i18n="hint">Enter to send · Shift+Enter for newline · drop images anywhere</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Settings -->
+<div class="ovl" id="settingsModal">
+  <div class="modal">
+    <h2 data-i18n="settings">Settings</h2>
+    <h3>AI</h3>
+    <div class="mrow"><label data-i18n="thinking">Show model reasoning</label><div class="tog" id="togThink"></div></div>
+    <h3 data-i18n="hVoice">Voice</h3>
+    <div class="mrow"><label data-i18n="voiceOut">Speak replies</label><div class="tog" id="togVoice"></div></div>
+    <div class="mrow"><label data-i18n="rotW">Subtle crackle effect</label><div class="tog" id="togRot"></div></div>
+    <div class="mrow"><label data-i18n="voiceTest">Test voice</label><button class="mcls" id="voiceTestBtn" data-i18n="test">Test</button></div>
+    <h3 data-i18n="hSound">Sounds</h3>
+    <div class="mrow"><label data-i18n="sendSound">Send sound</label><div class="tog" id="togSend"></div></div>
+    <h3>Memory</h3>
+    <div class="mrow" style="align-items:flex-start;flex-direction:column;gap:8px">
+      <div id="memList" style="width:100%;display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
+      <div id="memEmpty" style="font-size:13px;opacity:0.5;display:none">No memories saved yet.</div>
+      <button class="mcls" id="memClearBtn" style="background:transparent;border-color:var(--border);margin-top:4px">Clear all memories</button>
+    </div>
+    <h3>Onboarding</h3>
+    <div class="mrow"><label>First-run walkthrough</label><button class="mcls" id="wtReplayBtn">Show again</button></div>
+    <button class="mcls" data-close data-i18n="close">Close</button>
+  </div>
+</div>
+
+<!-- Personas -->
+<div class="ovl" id="personasModal">
+  <div class="modal" style="max-width:580px">
+    <h2>Personas</h2>
+    <div class="pc-grid" id="pList"></div>
+
+    <h3 data-i18n="aboutYou">About you</h3>
+    <textarea class="about-ta" id="aboutMe" placeholder="Tell NOEMA a little about you — your interests, how you like to be helped, anything relevant..."></textarea>
+    <div class="about-hint" data-i18n="aboutHint">This context gets added to every persona quietly in the background.</div>
+    <div class="ctx-preview" id="ctxPreview" style="display:none"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+      <button class="mcls" id="saveAboutBtn" data-i18n="save">Save</button>
+      <button class="mcls" id="retuneBtn" style="background:transparent;border-color:var(--border)" data-i18n="retune">Retune style</button>
+    </div>
+
+    <h3 data-i18n="createPersona">Create your own</h3>
+    <div class="pform">
+      <input id="pName" placeholder="Name"/>
+      <textarea id="pPrompt" placeholder="Instructions for NOEMA..."></textarea>
+      <button class="mcls" id="addPBtn" data-i18n="addP">Add persona</button>
+    </div>
+    <button class="mcls" data-close style="margin-top:6px">Close</button>
+  </div>
+</div>
+
+<!-- Audit Log -->
+<div class="ovl" id="auditModal">
+  <div class="audit-panel">
+    <div class="audit-header">
+      <div style="display:flex;align-items:center;gap:10px">
+        <h2 style="font-family:Cinzel,serif;font-size:16px;letter-spacing:3px;font-weight:700;color:#fff">ACTIVITY</h2>
+        <span class="audit-live" id="auditLive">Live</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="tb-btn" id="auditExport" title="Export to text">Export</button>
+        <button class="tb-btn" id="auditClose">Close</button>
+      </div>
+    </div>
+    <div class="audit-filters">
+      <div class="af-row" id="afType">
+        <button class="af-pill on" data-val="all">All</button>
+        <button class="af-pill" data-val="shell">Shell</button>
+        <button class="af-pill" data-val="file_read">File</button>
+        <button class="af-pill" data-val="web_search">Web</button>
+        <button class="af-pill" data-val="app_open">App</button>
+        <button class="af-pill" data-val="screenshot">Screen</button>
+        <button class="af-pill" data-val="session">Session</button>
+        <button class="af-pill" data-val="kill">Kill</button>
+      </div>
+      <div class="af-row" style="margin-top:6px">
+        <div id="afStatus" style="display:flex;gap:6px">
+          <button class="af-pill on" data-val="all">All</button>
+          <button class="af-pill" data-val="success">Success</button>
+          <button class="af-pill" data-val="blocked">Blocked</button>
+        </div>
+        <div id="afTime" style="display:flex;gap:6px;margin-left:auto">
+          <button class="af-pill on" data-val="all">All time</button>
+          <button class="af-pill" data-val="today">Today</button>
+          <button class="af-pill" data-val="week">This week</button>
+        </div>
+      </div>
+    </div>
+    <div class="audit-body" id="auditBody">
+      <div class="audit-empty" id="auditEmpty" style="display:none">No entries match the current filter.</div>
+    </div>
+    <div class="audit-footer" id="auditFooter"></div>
+  </div>
+</div>
+
+<!-- Walkthrough -->
+<div class="wt-ovl" id="wtOverlay" role="dialog" aria-modal="true" aria-label="NOEMA walkthrough">
+  <div class="wt-modal">
+    <button class="wt-skip" id="wtSkip">Skip</button>
+    <div class="wt-viewport">
+      <div class="wt-track" id="wtTrack">
+
+        <!-- Card 1: Meet NOEMA -->
+        <div class="wt-card">
+          <div class="wt-card-num">01 — 05</div>
+          <svg class="wt-sigil" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="26" cy="26" r="23.5" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+            <path d="M13 39V13L39 39V13" stroke="rgba(255,255,255,0.88)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="26" cy="26" r="2.8" fill="rgba(255,255,255,0.85)"/>
+          </svg>
+          <div class="wt-card-h">Meet NOEMA</div>
+          <div class="wt-card-body">A personal AI that runs entirely on your computer. It can search the web, read your files, and remember things across conversations.</div>
+          <div class="wt-card-sub">Everything stays local. Nothing leaves this machine.</div>
+        </div>
+
+        <!-- Card 2: Conversations -->
+        <div class="wt-card">
+          <div class="wt-card-num">02 — 05</div>
+          <div class="wt-card-h">Conversations</div>
+          <div class="wt-card-body">Type anything in the box to start. Your history is always saved and searchable from the sidebar.</div>
+          <div class="wt-card-sub">
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="wt-pill">+ New chat</span>
+                <span style="font-size:12px;color:var(--text3)">Start a fresh thread</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="wt-pill">Personas</span>
+                <span style="font-size:12px;color:var(--text3)">Change how NOEMA thinks</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="wt-pill">Audit Log</span>
+                <span style="font-size:12px;color:var(--text3)">Review every action taken</span>
+              </div>
+            </div>
+            <div style="margin-top:11px;font-size:11.5px;color:var(--text3)">All three buttons live at the bottom of the sidebar.</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Emergency Stop -->
+        <div class="wt-card wt-warn">
+          <div class="wt-card-num">03 — 05</div>
+          <div class="wt-card-h">Emergency Stop</div>
+          <div class="wt-card-body">NOEMA can search the web and read files on your computer. You're always in full control — here's how to stop it instantly.</div>
+          <div class="wt-warn-box">
+            <div style="flex:1">
+              <div class="wt-warn-label">Stop NOEMA immediately</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.65">
+                <span class="wt-kbd">⌘</span>&thinsp;<span class="wt-kbd">⇧</span>&thinsp;<span class="wt-kbd">Esc</span>
+                &nbsp;— opens full emergency controls from anywhere
+              </div>
+              <div style="font-size:11.5px;color:var(--text3);margin-top:7px">Single <span class="wt-kbd">Esc</span> cancels only the current request. The Stop button (bottom-left) does the same.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Audit Log -->
+        <div class="wt-card">
+          <div class="wt-card-num">04 — 05</div>
+          <div class="wt-card-h">Full Transparency</div>
+          <div class="wt-card-body">Every action NOEMA takes is written to an append-only audit log — web searches, file reads, everything. NOEMA cannot modify or delete this record.</div>
+          <div class="wt-card-sub" style="margin-top:14px">Open <strong style="color:var(--text);font-weight:500">Audit Log</strong> from the sidebar at any time to see the full history — what ran, when, and whether it was blocked.</div>
+        </div>
+
+        <!-- Card 5: Ready -->
+        <div class="wt-card">
+          <div class="wt-card-num">05 — 05</div>
+          <div class="wt-card-h">You're Ready</div>
+          <div class="wt-card-body">Something to try first:</div>
+          <div class="wt-try-box">
+            <div class="wt-try-q">"Search for the latest news about AI"</div>
+            <div class="wt-try-hint">NOEMA will search the web and summarise the results — a quick way to see what it's capable of.</div>
+          </div>
+        </div>
+
+      </div><!-- /wt-track -->
+    </div><!-- /wt-viewport -->
+
+    <div class="wt-footer">
+      <button class="wt-nav" id="wtBack">← Back</button>
+      <div class="wt-dots" id="wtDots"></div>
+      <button class="wt-nav wt-next" id="wtNext">Next →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FIRST-RUN SETUP SCREEN -->
+<div class="auth-screen" id="setupScreen" style="display:none">
+  <div class="auth-card">
+    <svg class="auth-sigil" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="26" cy="26" r="23.5" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/>
+      <path d="M13 39V13L39 39V13" stroke="rgba(255,255,255,0.88)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="26" cy="26" r="2.8" fill="rgba(255,255,255,0.85)"/>
+    </svg>
+    <div class="auth-logo">NOEMA</div>
+    <div class="auth-tagline" id="setupTagline">Your personal intelligence</div>
+    <div class="auth-fields" style="width:100%">
+      <div class="auth-field">
+        <input type="text" id="setupNameInput" placeholder=" " autocomplete="given-name"/>
+        <span class="auth-field-label">Your name</span>
+      </div>
+    </div>
+    <button class="auth-submit" id="setupNameBtn">Get started</button>
+    <div class="auth-err" id="setupNameErr"></div>
+  </div>
+</div>
+
+<!-- KILL LEVEL MODAL -->
+<div class="ovl" id="killModal">
+  <div class="modal" style="max-width:440px">
+    <h2 style="margin-bottom:6px">Emergency Controls</h2>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:16px">Choose how forcefully to stop NOEMA.</p>
+    <div class="kill-opts">
+      <div class="kill-opt pause" id="killPause">
+        <div class="kill-opt-icon">⏸</div>
+        <div class="kill-opt-body">
+          <div class="kill-opt-name">Pause</div>
+          <div class="kill-opt-desc">Stop the current request. Server keeps running. You can send new messages.</div>
+        </div>
+      </div>
+      <div class="kill-opt kill-l" id="killKill">
+        <div class="kill-opt-icon">⚡</div>
+        <div class="kill-opt-body">
+          <div class="kill-opt-name">Kill Server</div>
+          <div class="kill-opt-desc">Stop the current request and shut down the server. Reopen the app to restart.</div>
+        </div>
+      </div>
+      <div class="kill-opt nuke" id="killNuke">
+        <div class="kill-opt-icon">☢</div>
+        <div class="kill-opt-body">
+          <div class="kill-opt-name">Nuke</div>
+          <div class="kill-opt-desc">Kill server + wipe all temporary files created this session.</div>
+        </div>
+      </div>
+    </div>
+    <button class="mcls" data-close style="margin-top:16px">Cancel</button>
+  </div>
+</div>
+
+<!-- PROFILE QUIZ -->
+<div class="quiz-ovl" id="quizOverlay" style="display:none">
+  <button class="quiz-skip" id="quizSkip">Skip</button>
+  <div class="quiz-inner" id="quizInner"></div>
+  <div class="quiz-dots" id="quizDots"></div>
+</div>
+
+<!-- EXAM QUIZ MODAL -->
+<div class="eq-modal" id="eqModal" style="display:none">
+  <div class="eq-header">
+    <div class="eq-title" id="eqTitle">ΕΞΕΤΑΣΤΙΚΟ ΚΟΥΙΖ</div>
+    <div class="eq-score" id="eqScore" style="display:none"></div>
+    <button class="eq-close" id="eqClose" aria-label="Close">×</button>
+  </div>
+  <div class="eq-body">
+    <div class="eq-inner" id="eqInner"></div>
+  </div>
+</div>
+
+<script>
+// ── HEADERS ───────────────────────────────────────────────────
+function apiHeaders() {
+  return { "Content-Type": "application/json" };
+}
+
+// ── QUIZ & USER CONTEXT ───────────────────────────────────────
+const QUIZ=[
+  {step:"01 — 04",q:"How do you want NOEMA to answer?",key:"style",opts:[
+    {label:"Just the answer",sub:"Skip the reasoning — give me what I need.",val:"A"},
+    {label:"Show your work",sub:"I want to understand the why behind it.",val:"B"},
+    {label:"Read the room",sub:"Match the depth to what I'm actually asking.",val:"C"},
+  ]},
+  {step:"02 — 04",q:"When you're working through something complex...",key:"depth",opts:[
+    {label:"Go deep",sub:"Take your time. I want the full picture.",val:"A"},
+    {label:"Map it first",sub:"Give me an overview, then I'll ask for more.",val:"B"},
+    {label:"Stay sharp",sub:"Quick and pointed. No tangents.",val:"C"},
+  ]},
+  {step:"03 — 04",q:"What tone feels right?",key:"tone",opts:[
+    {label:"Warm",sub:"Like talking to someone who genuinely cares.",val:"A"},
+    {label:"Precise",sub:"Direct and clean. No filler.",val:"B"},
+    {label:"Balanced",sub:"Warm when it matters, sharp when it counts.",val:"C"},
+  ]},
+  {step:"04 — 04",q:"When NOEMA is uncertain or wrong...",key:"value",opts:[
+    {label:"Tell me straight",sub:"I'd rather know than feel good about it.",val:"A"},
+    {label:"Frame it gently",sub:"Acknowledge it — but how you say it matters.",val:"B"},
+    {label:"Flag it and move",sub:"Note the uncertainty briefly, then get on with it.",val:"C"},
+  ]},
+];
+const QUIZ_CTX={
+  style:{
+    A:"Give direct answers without explaining reasoning unless explicitly asked.",
+    B:"Show your reasoning — the user values understanding the why, not just the answer.",
+    C:"Calibrate depth to the question: brief for simple questions, thorough for complex ones.",
+  },
+  depth:{
+    A:"When exploring complex topics, go deep and thorough — the user wants the full picture.",
+    B:"Lead with an overview; let the user pull for more detail rather than front-loading everything.",
+    C:"Stay focused — avoid tangents, keep responses sharp and on-point.",
+  },
+  tone:{
+    A:"Use a warm, genuinely caring tone.",
+    B:"Use a precise, clinical tone — minimal pleasantries, maximum signal.",
+    C:"Balance warmth with precision — warm when appropriate, direct when it counts.",
+  },
+  value:{
+    A:"Be direct about uncertainty or errors — this user prefers honesty over comfort.",
+    B:"Acknowledge uncertainty gently — how it's framed matters to this user.",
+    C:"Flag uncertainty briefly and clearly, then move on without dwelling.",
+  },
+};
+function buildUserContext(){
+  const p=S.profile||{};
+  const parts=[];
+  if(p.style)parts.push(QUIZ_CTX.style[p.style]);
+  if(p.depth)parts.push(QUIZ_CTX.depth[p.depth]);
+  if(p.tone) parts.push(QUIZ_CTX.tone[p.tone]);
+  if(p.value)parts.push(QUIZ_CTX.value[p.value]);
+  const pref=parts.length?`[Adapt to this user: ${parts.join(" ")}]`:"";
+  const about=(p.aboutMe||"").trim();
+  const aboutStr=about?`[About this user: ${about}]`:"";
+  return[pref,aboutStr].filter(Boolean).join("\n");
+}
+function updateCtxPreview(){
+  const el=$("#ctxPreview");if(!el)return;
+  const ctx=buildUserContext();
+  if(ctx){el.textContent=ctx;el.style.display="block";}
+  else{el.style.display="none";}
+}
+
+// ── DATA ──────────────────────────────────────────────────────
+const PERSONAS=[
+  {id:"default",name:"Default",desc:"Just NOEMA.",name_gr:"NOEMA",desc_gr:"Για ό,τι χρειαστείς.",builtin:true,
+   prompt:"You are NOEMA — a calm, thoughtful personal assistant. Respond clearly and with warmth."},
+  {id:"chem",name:"Chemistry Tutor",desc:"For the future pharmaceutical researcher.",name_gr:"Χημεία",desc_gr:"Εξηγεί από την αρχή.",builtin:true,
+   prompt:"You are a patient, rigorous chemistry tutor for a bright 12-year-old who wants to become a pharmaceutical researcher. Explain from first principles. Use analogies. Show IUPAC names when relevant. Age-appropriate but never condescending."},
+  {id:"debate",name:"Debate Partner",desc:"Always argues the opposite. No mercy.",name_gr:"Αντίλογος",desc_gr:"Αντιλέγει σε ό,τι πεις.",builtin:true,
+   prompt:"Your ONLY job is to argue the opposite position from whatever the user says. No hedging, no balance. Take the opposing side hard — use evidence, name fallacies, ask pointed questions."},
+  {id:"greek",name:"Greek Tutor",desc:"English essays & vocabulary for a Greek student.",name_gr:"Αγγλικά",desc_gr:"Εκθέσεις, γραμματική, λεξιλόγιο.",builtin:true,
+   prompt:"Είσαι δάσκαλος Αγγλικών για Έλληνα μαθητή 12 χρονών. Βοηθάς με εκθέσεις, γραμματική, λεξιλόγιο. Δίνεις εξηγήσεις και στα δύο. Διορθώνεις με σαφήνεια.\n\nYou are an English tutor for a 12-year-old Greek student. Help with essays, grammar, vocabulary. Explain in both languages when helpful."},
+  {id:"hw",name:"Homework Helper",desc:"All subjects.",name_gr:"Κατ' οίκον",desc_gr:"Για ό,τι έχεις στο τετράδιο.",builtin:true,
+   prompt:"You are a patient homework helper for a bright 12-year-old. Help across all subjects. Guide reasoning rather than just giving answers. Show work step by step."},
+  {id:"essay",name:"Essay Coach",desc:"Structure, argument, clarity.",name_gr:"Έκθεση",desc_gr:"Σε βοηθά να γράφεις καλύτερα.",builtin:true,
+   prompt:"You are a writing coach specialising in academic essays. Help the user plan, draft, and revise. Focus on clear thesis statements, logical structure, evidence, and concise prose. Point out weak arguments and vague language directly."},
+  {id:"math",name:"Maths Tutor",desc:"Step-by-step. No skipping.",name_gr:"Μαθηματικά",desc_gr:"Βήμα βήμα, χωρίς να πηδάμε.",builtin:true,
+   prompt:"You are a patient maths tutor. Always show full working. Explain each step before moving to the next. When the user makes an error, identify exactly where they went wrong and guide them to find the correct answer themselves rather than just giving it."},
+  {id:"physics",name:"Physics Tutor",desc:"Forces, laws, and why things move.",name_gr:"Φυσική",desc_gr:"Δυνάμεις, νόμοι και κίνηση.",builtin:true,
+   prompt:"You are a patient physics tutor for a Greek high school student. Explain from first principles using analogies and clear text diagrams. Cover mechanics, waves, electricity, optics, thermodynamics. Always write formulas clearly using standard notation. Show full working for problems. When the student writes in Greek, respond in Greek."},
+  {id:"history",name:"History Tutor",desc:"Ancient Greece to modern times.",name_gr:"Ιστορία",desc_gr:"Από την αρχαιότητα μέχρι σήμερα.",builtin:true,
+   prompt:"You are a history tutor with deep knowledge of the Greek school curriculum: ancient Greek history, Byzantine period, Ottoman occupation, the Greek Revolution of 1821, and modern Greek history. Help students understand causes and effects, analyse historical sources, and write structured history essays. When the student writes in Greek, respond in Greek."},
+];
+
+const SUBTITLES=[
+  "Your personal AI","Ready to think","Ask anything",
+  "Let's figure it out","Ask me anything","Thinking alongside you",
+  "What's on your mind?","At your command",
+];
+const GREEK_SUBTITLES=[
+  "Σε ακούω.","Πες μου.","Τι έχεις;","Ρώτα.",
+  "Εδώ είμαι.","Λέγε.","Τι τρέχει;","Στη διάθεσή σου.",
+];
+
+const PROPHECIES=[
+  "Ask the question you're afraid to ask.",
+  "Knowledge waits in the deep places.",
+  "Each question is a small key.",
+  "A mind is a lamp. Tonight, we light it.",
+  "The wind carries two things: seeds, and secrets.",
+  "Speak, and the world leans in to listen.",
+  "Fear not the shadow. Ask it questions.",
+  "What do you want to know?",
+  "Begin.",
+  "What haven't you questioned yet?",
+  "One good question beats a thousand bad ones.",
+  "Learn it deeply or not at all.",
+  "Every expert was once a beginner.",
+  "Curiosity is a skill, not a trait.",
+  "The first draft is never the last.",
+  "The answer is closer than you think.",
+  "Think slowly. Decide clearly.",
+  "What would you ask if you weren't afraid to be wrong?",
+  "Understanding takes time. Use it.",
+  "The harder the question, the more it's worth asking.",
+];
+
+const GREEK_PROPHECIES=[
+  "Κάνε την ερώτηση.",
+  "Δεν υπάρχουν χαζές ερωτήσεις.",
+  "Ένα βήμα τη φορά.",
+  "Πρώτα κατάλαβε, μετά προχώρα.",
+  "Γράφε, σκέψου, ξαναγράφε.",
+  "Ρώτα. Πάντα ρώτα.",
+  "Η δουλειά φαίνεται.",
+  "Διάβασέ το ξανά.",
+  "Σκέψου πρώτα.",
+  "Δεν χάνεις αν ρωτάς.",
+  "Αρχή ήμισυ παντός.",
+  "Η λεπτομέρεια κάνει τη διαφορά.",
+  "Σιγά σιγά.",
+  "Κάθε μέρα λίγο.",
+  "Μάθε από λάθη, όχι από φόβο.",
+  "Γιατί; Πάντα ρώτα γιατί.",
+  "Ξαναδιάβασέ το.",
+  "Δεν πειράζει αν δεν ξέρεις.",
+  "Εδώ δουλεύουμε.",
+  "Προσπάθησε ξανά.",
+];
+
+const WORDS=[
+  {w:"Ephemeral",p:"ih-FEM-er-ul",d:"Lasting only a very short time.",e:"Social media trends are ephemeral — gone as quickly as they appear."},
+  {w:"Catalyst",p:"KAT-uh-list",d:"Something that speeds up a process or sparks change.",e:"The printing press was a catalyst for the Renaissance."},
+  {w:"Tenacious",p:"tuh-NAY-shus",d:"Holding firmly to a purpose; not giving up easily.",e:"Her tenacious study habits helped her ace every exam."},
+  {w:"Empirical",p:"em-PEER-ih-kul",d:"Based on observation and experiment, not theory alone.",e:"The scientist sought empirical evidence before drawing any conclusions."},
+  {w:"Paradox",p:"PAIR-uh-doks",d:"A statement that seems contradictory but reveals a deeper truth.",e:"It's a paradox: the more you chase perfection, the harder it becomes."},
+  {w:"Synthesis",p:"SIN-thuh-sis",d:"Combining elements to form a new, unified whole.",e:"Her essay was a brilliant synthesis of three competing theories."},
+  {w:"Resilience",p:"rih-ZIL-ee-unts",d:"The ability to recover quickly from setbacks.",e:"Resilience is often more valuable than raw talent."},
+  {w:"Ambiguous",p:"am-BIG-yoo-us",d:"Having more than one possible meaning.",e:"The poem's ending was deliberately ambiguous, leaving readers to decide."},
+  {w:"Meticulous",p:"muh-TIK-yuh-lus",d:"Showing great attention to detail.",e:"A meticulous approach to revision leads to better results."},
+  {w:"Inference",p:"IN-fer-unts",d:"A conclusion reached through evidence and reasoning.",e:"From the data, we can draw the inference that sleep affects memory."},
+  {w:"Cogent",p:"KOH-jent",d:"Clear, logical, and convincing.",e:"She made a cogent argument that changed the committee's mind."},
+  {w:"Discrepancy",p:"dis-KREP-un-see",d:"A difference between two things that should match.",e:"There was a discrepancy between the lab results and the expected values."},
+  {w:"Verbose",p:"ver-BOHS",d:"Using more words than necessary.",e:"His essay was verbose — two pages of content stretched across eight."},
+  {w:"Lucid",p:"LOO-sid",d:"Expressed clearly; easy to understand.",e:"A lucid explanation made the complex theorem feel simple."},
+  {w:"Hypothesis",p:"hy-POTH-uh-sis",d:"A proposed explanation based on limited evidence, to be tested.",e:"Her hypothesis was confirmed by the experiment."},
+  {w:"Nuance",p:"NOO-ahns",d:"A subtle difference in meaning, expression, or tone.",e:"Understanding nuance in language is crucial for strong writing."},
+  {w:"Eloquent",p:"EL-oh-kwent",d:"Fluent and persuasive in speaking or writing.",e:"His eloquent speech moved the entire auditorium."},
+  {w:"Pragmatic",p:"prag-MAT-ik",d:"Dealing with things realistically rather than theoretically.",e:"A pragmatic student focuses on what works, not just what's ideal."},
+  {w:"Credible",p:"KRED-ih-bul",d:"Able to be believed; convincing.",e:"Always cite credible sources in your research papers."},
+  {w:"Iterate",p:"IT-uh-rayt",d:"To repeat a process, each time improving on the last.",e:"Good writers iterate — they draft, revise, and refine repeatedly."},
+  {w:"Concise",p:"kun-SISE",d:"Giving a lot of information clearly and in few words.",e:"Aim for concise answers — quality always beats quantity."},
+  {w:"Arbitrary",p:"AR-bih-trer-ee",d:"Based on random choice rather than reason or system.",e:"The grading felt arbitrary — students couldn't identify the criteria."},
+  {w:"Perpetual",p:"per-PECH-oo-ul",d:"Never ending; occurring continuously.",e:"The perpetual hum of the server room filled the lab."},
+  {w:"Scrutinize",p:"SKROO-tih-nize",d:"To examine or inspect closely and critically.",e:"Scrutinize your sources before including them in an essay."},
+  {w:"Derive",p:"dih-RIVE",d:"To obtain or reach by reasoning or calculation.",e:"We can derive the formula from first principles."},
+  {w:"Inevitable",p:"in-EV-ih-tuh-bul",d:"Certain to happen; impossible to avoid.",e:"With deliberate practice, improvement feels inevitable."},
+  {w:"Diligent",p:"DIL-ih-jent",d:"Having or showing steady effort and hard work.",e:"Diligent revision, not last-minute cramming, leads to mastery."},
+  {w:"Axiom",p:"AK-see-um",d:"A statement accepted as self-evidently true.",e:"'Parallel lines never meet' is a geometric axiom."},
+  {w:"Annotate",p:"AN-oh-tayt",d:"To add explanatory notes to a text.",e:"Annotate your reading to engage actively with the material."},
+  {w:"Analogous",p:"uh-NAL-oh-gus",d:"Comparable in certain respects; similar in function.",e:"The heart is analogous to a pump."},
+  {w:"Pervasive",p:"per-VAY-siv",d:"Spreading widely through an area or a group.",e:"Smartphone use has become pervasive among teenagers."},
+  {w:"Rhetoric",p:"RET-or-ik",d:"Persuasive language used in writing or speech.",e:"Understanding rhetoric helps you spot manipulation in media."},
+  {w:"Inherent",p:"in-HEER-ent",d:"Existing as a permanent, essential quality of something.",e:"There is an inherent beauty in mathematical proof."},
+  {w:"Proliferate",p:"proh-LIF-er-ayt",d:"To increase rapidly in number or spread quickly.",e:"Misinformation can proliferate quickly on social media."},
+  {w:"Substantiate",p:"sub-STAN-shee-ayt",d:"To provide evidence to support or prove a claim.",e:"You need data to substantiate your argument in the lab report."},
+  {w:"Juxtapose",p:"JUK-stuh-pohz",d:"To place two things side by side to compare or contrast.",e:"The essay juxtaposes modern and ancient views of justice."},
+  {w:"Elucidate",p:"ih-LOO-sih-dayt",d:"To make something clear; to explain.",e:"Can you elucidate what you mean by that argument?"},
+  {w:"Infer",p:"in-FER",d:"To conclude from evidence rather than from explicit statement.",e:"From the tone of the passage, we can infer the author's attitude."},
+  {w:"Coherent",p:"koh-HEER-ent",d:"Logical and consistent; forming a unified whole.",e:"A coherent argument flows from premise to conclusion without gaps."},
+  {w:"Refute",p:"rih-FYOOT",d:"To prove a statement or theory to be wrong.",e:"The new data completely refuted the original hypothesis."},
+];
+
+const I18N={
+  en:{newChat:"New chat",wordofday:"Word of the day",chats:"Conversations",personas:"Personas",settings:"Settings",auditLog:"Audit Log",hint:"Enter to send · Shift+Enter for newline · drop images anywhere",thinking:"Show model reasoning",hVoice:"Voice",voiceOut:"Speak replies",rotW:"Subtle crackle effect",voiceTest:"Test voice",test:"Test",hSound:"Sounds",sendSound:"Send sound",close:"Close",addP:"Add persona",createPersona:"Create your own",untitled:"New chat",errOllama:"Can't reach Ollama. Make sure it's running, then refresh.",errNoModel:"No models found. Open Ollama and pull a model first.",aboutYou:"About you",aboutHint:"This context gets added to every persona quietly in the background.",save:"Save",retune:"Retune style",pNamePh:"Name",pPromptPh:"Instructions for NOEMA..."},
+  gr:{newChat:"Νέα συνομιλία",wordofday:"Λέξη της ημέρας",chats:"Συνομιλίες",personas:"Χαρακτήρες",settings:"Ρυθμίσεις",auditLog:"Ιστορικό ενεργειών",hint:"Enter για αποστολή · Shift+Enter για νέα γραμμή · σύρε εικόνες",thinking:"Εμφάνιση συλλογισμού",hVoice:"Φωνή",voiceOut:"Εκφώνηση απαντήσεων",rotW:"Εφέ παρασίτων",voiceTest:"Δοκιμή φωνής",test:"Δοκιμή",hSound:"Ήχοι",sendSound:"Ήχος αποστολής",close:"Κλείσιμο",addP:"Προσθήκη",createPersona:"Φτιάξε δικό σου",untitled:"Νέα συνομιλία",errOllama:"Δεν ανταποκρίνεται το Ollama. Βεβαιώσου ότι τρέχει και ανανέωσε.",errNoModel:"Δεν βρέθηκαν μοντέλα. Άνοιξε το Ollama και κατέβασε ένα μοντέλο.",aboutYou:"Σχετικά με σένα",aboutHint:"Αυτό προστίθεται σε κάθε χαρακτήρα στο παρασκήνιο.",save:"Αποθήκευση",retune:"Επαναρύθμιση στυλ",pNamePh:"Όνομα",pPromptPh:"Οδηγίες για τη NOEMA..."},
+};
+
+// ── STATE ─────────────────────────────────────────────────────
+const KEY="noema_v1";
+const mkS=()=>({threads:[],aid:null,personas:PERSONAS.map(p=>({...p})),ap:"default",model:null,walkthroughDone:false,profile:{quizDone:false,style:null,depth:null,tone:null,value:null,aboutMe:""},s:{thinking:false,voice:false,rot:false,sound:true,lang:"en",greekStudent:false}});
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY)||"null");if(!r)return mkS();const d=mkS();return{...d,...r,s:{...d.s,...r.s},personas:mergeP(d.personas,r.personas||[]),profile:{...d.profile,...(r.profile||{})},walkthroughDone:r.walkthroughDone||false};}catch{return mkS()}
+}
+function mergeP(defs,stored){const m=new Map(defs.map(p=>[p.id,p]));stored.forEach(p=>{if(!p.builtin)m.set(p.id,p)});return[...m.values()]}
+
+// ── PERSISTENCE (server-side + localStorage mirror) ───────────
+let _saveTimer = null;
+function save() {
+  // Always write to localStorage immediately (fast reads)
+  localStorage.setItem(KEY, JSON.stringify(S));
+  // Debounce server write by 600 ms so rapid updates don't flood
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveToServer, 600);
+  // Mark search index stale — rebuilt lazily on next search query
+  _srDirty = true;
+}
+async function saveToServer() {
+  try {
+    await fetch("/api/threads", {
+      method: "POST",
+      headers: apiHeaders(),
+      body: JSON.stringify({
+        threads:         S.threads,
+        aid:             S.aid,
+        ap:              S.ap,
+        model:           S.model,
+        quizDone:        !!S.profile?.quizDone,
+        walkthroughDone: !!S.walkthroughDone,
+      }),
+    });
+  } catch {}
+}
+async function loadFromServer() {
+  try {
+    const r = await fetch("/api/threads", { headers: apiHeaders() });
+    if (!r.ok) return null;
+    const data = await r.json();
+    return (data.threads && data.threads.length > 0) ? data : null;
+  } catch { return null; }
+}
+function applyServerState(data) {
+  if (!data) return;
+  // Server is source of truth for threads and one-time flags; keep local device settings (s)
+  if (data.threads) S.threads = data.threads;
+  if (data.aid)     S.aid     = data.aid;
+  if (data.ap)      S.ap      = data.ap  || S.ap;
+  if (data.model)   S.model   = data.model;
+  if (data.quizDone)        S.profile = {...S.profile, quizDone: true};
+  if (data.walkthroughDone) S.walkthroughDone = true;
+  localStorage.setItem(KEY, JSON.stringify(S)); // sync cache
+}
+
+let S=load();
+
+// ── MATH RENDERING ───────────────────────────────────────────
+function renderMath(el){
+  if(!el||!window.renderMathInElement)return;
+  try{
+    renderMathInElement(el,{
+      delimiters:[
+        {left:'$$',right:'$$',display:true},
+        {left:'$',right:'$',display:false},
+        {left:'\\[',right:'\\]',display:true},
+        {left:'\\(',right:'\\)',display:false},
+      ],
+      throwOnError:false,
+    });
+  }catch(e){}
+}
+
+// ── UTILS ─────────────────────────────────────────────────────
+const $=s=>document.querySelector(s);const $$=s=>Array.from(document.querySelectorAll(s));
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const tr=k=>I18N[S.s.lang][k]||k;
+const at=()=>S.threads.find(t=>t.id===S.aid);
+function toast(msg,ms=5e3){const e=$("#toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),ms)}
+
+// ── SUBTITLE ─────────────────────────────────────────────────
+function setSub(){const pool=S.s.greekStudent?GREEK_SUBTITLES:SUBTITLES;const i=Math.floor(Date.now()/(8*60*1000))%pool.length;$("#sub").textContent=pool[i]}
+
+// ── WORD OF THE DAY ───────────────────────────────────────────
+const GREEK_WORDS=[
+  {w:"Δημοκρατία",p:"δη-μο-κρα-τί-α",d:"Πολίτευμα όπου η εξουσία ανήκει στο λαό."},
+  {w:"Φιλοσοφία",p:"φι-λο-σο-φί-α",d:"Η αγάπη για τη σοφία· η επιστήμη που ερευνά τις θεμελιώδεις αρχές της ύπαρξης."},
+  {w:"Υπόθεση",p:"υ-πό-θε-ση",d:"Προκαταρκτική εξήγηση που χρειάζεται επαλήθευση μέσω πειράματος ή έρευνας."},
+  {w:"Ανάλυση",p:"α-νά-λυ-ση",d:"Η διαδικασία διάσπασης ενός συνόλου στα επιμέρους στοιχεία του για καλύτερη κατανόηση."},
+  {w:"Σύνθεση",p:"σύν-θε-ση",d:"Η ένωση επιμέρους στοιχείων σε ένα ενιαίο σύνολο."},
+  {w:"Αναλογία",p:"α-να-λο-γί-α",d:"Σχέση ομοιότητας ή αντιστοιχίας μεταξύ δύο πραγμάτων."},
+  {w:"Παράδοξο",p:"πα-ρά-δο-ξο",d:"Φαινομενικά αντιφατική πρόταση που αποκαλύπτει μια βαθύτερη αλήθεια."},
+  {w:"Αιτιοκρατία",p:"αι-τι-ο-κρα-τί-α",d:"Η φιλοσοφική άποψη ότι κάθε γεγονός έχει αιτία."},
+  {w:"Επαγωγή",p:"ε-πα-γω-γή",d:"Συλλογιστική μέθοδος που οδηγεί από ειδικές περιπτώσεις σε γενικά συμπεράσματα."},
+  {w:"Απαγωγή",p:"α-πα-γω-γή",d:"Συλλογιστική μέθοδος που οδηγεί από γενικές αρχές σε ειδικά συμπεράσματα."},
+  {w:"Αριστοκρατία",p:"α-ρι-στο-κρα-τί-α",d:"Πολίτευμα ή κοινωνική τάξη που βασίζεται στην αριστεία και την καταγωγή."},
+  {w:"Ολιγαρχία",p:"ο-λι-γαρ-χί-α",d:"Πολίτευμα όπου η εξουσία ανήκει σε μια μικρή ομάδα ατόμων."},
+  {w:"Τυραννία",p:"τυ-ραν-νί-α",d:"Αυταρχικό καθεστώς εξουσίας χωρίς νόμους και δικαιώματα."},
+  {w:"Μεταφορά",p:"με-τα-φο-ρά",d:"Σχήμα λόγου που αποδίδει σε κάτι ιδιότητες άλλου χωρίς «σαν» ή «ωσάν»."},
+  {w:"Παρομοίωση",p:"πα-ρο-μοί-ω-ση",d:"Σχήμα λόγου που συγκρίνει δύο πράγματα με τη βοήθεια του «σαν» ή «ωσάν»."},
+  {w:"Αλληγορία",p:"αλ-λη-γο-ρί-α",d:"Αφηγηματικό σχήμα που εκφράζει αφηρημένες έννοιες μέσα από συγκεκριμένα στοιχεία."},
+  {w:"Ειρωνεία",p:"ει-ρω-νεί-α",d:"Τρόπος έκφρασης όπου εννοείται το αντίθετο από αυτό που λέγεται."},
+  {w:"Υπερβολή",p:"υ-περ-βο-λή",d:"Σχήμα λόγου που μεγαλοποιεί ή μικραίνει υπερβολικά την πραγματικότητα."},
+  {w:"Αποστροφή",p:"α-πο-στρο-φή",d:"Απευθυνόμαστε σε πρόσωπο ή πράγμα που απουσιάζει σαν να ήταν παρόν."},
+  {w:"Εκφραστικότητα",p:"εκ-φρα-στι-κό-τη-τα",d:"Η ικανότητα να αποδίδει κανείς ιδέες και συναισθήματα με ζωντάνια και σαφήνεια."},
+  {w:"Ρητορική",p:"ρη-το-ρι-κή",d:"Η τέχνη της πειστικής ομιλίας και γραφής."},
+  {w:"Επιχείρημα",p:"ε-πι-χεί-ρη-μα",d:"Λογική αιτιολόγηση για την υποστήριξη μιας θέσης."},
+  {w:"Αντεπιχείρημα",p:"αν-τε-πι-χεί-ρη-μα",d:"Επιχείρημα που αντικρούει άλλη άποψη."},
+  {w:"Αξίωμα",p:"α-ξί-ω-μα",d:"Αρχή που γίνεται δεκτή χωρίς απόδειξη ως αυταπόδεικτη αλήθεια."},
+  {w:"Θεώρημα",p:"θε-ώ-ρη-μα",d:"Μαθηματική πρόταση που αποδεικνύεται με λογικά βήματα."},
+  {w:"Παραστατικά",p:"πα-ρα-στα-τι-κά",d:"Ποσότητες που απεικονίζονται γεωμετρικά ή αλγεβρικά στα μαθηματικά."},
+  {w:"Αλγόριθμος",p:"αλ-γό-ρι-θμος",d:"Ορισμένη σειρά βημάτων για την επίλυση ενός προβλήματος."},
+  {w:"Ισοδύναμο",p:"ι-σο-δύ-να-μο",d:"Δύο εκφράσεις ή προτάσεις που έχουν την ίδια τιμή ή σημασία."},
+  {w:"Μεταβλητή",p:"με-τα-βλη-τή",d:"Σύμβολο που αντιπροσωπεύει άγνωστη ή μεταβαλλόμενη ποσότητα."},
+  {w:"Φωτοσύνθεση",p:"φω-το-σύν-θε-ση",d:"Η διαδικασία με την οποία τα φυτά παράγουν οξυγόνο και τροφή από το φως του ήλιου."},
+  {w:"Μεταβολισμός",p:"με-τα-βο-λι-σμός",d:"Το σύνολο των χημικών αντιδράσεων που συντηρούν τη ζωή σε έναν οργανισμό."},
+  {w:"Εξέλιξη",p:"ε-ξέ-λι-ξη",d:"Η σταδιακή μεταβολή των οργανισμών μέσα στον χρόνο μέσω φυσικής επιλογής."},
+  {w:"Οικοσύστημα",p:"οι-κο-σύ-στη-μα",d:"Σύνολο οργανισμών και αβιοτικών παραγόντων που αλληλεπιδρούν σε έναν χώρο."},
+  {w:"Αλληλεπίδραση",p:"αλ-λη-λε-πί-δρα-ση",d:"Αμοιβαία επίδραση δύο ή περισσότερων στοιχείων το ένα στο άλλο."},
+  {w:"Επανάσταση",p:"ε-πα-νά-στα-ση",d:"Ριζική πολιτική ή κοινωνική αλλαγή, συχνά με βίαια μέσα."},
+  {w:"Αποικισμός",p:"α-ποι-κι-σμός",d:"Η εγκατάσταση ατόμων από μια χώρα σε άλλη περιοχή για δημιουργία αποικίας."},
+  {w:"Βιομηχανοποίηση",p:"βι-ο-μη-χα-νο-ποί-η-ση",d:"Η μετάβαση από αγροτική σε βιομηχανική παραγωγή."},
+  {w:"Παγκοσμιοποίηση",p:"πα-γκο-σμι-ο-ποί-η-ση",d:"Η αυξανόμενη αλληλεξάρτηση των χωρών σε οικονομικό, πολιτικό και πολιτισμικό επίπεδο."},
+];
+
+function renderWord(){
+  const d=new Date();const day=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);
+  if(S.s.greekStudent){
+    const w=GREEK_WORDS[(day*7+d.getFullYear())%GREEK_WORDS.length];
+    $("#fN").textContent=w.w;$("#fB").textContent=w.p;$("#fNt").textContent=w.d;
+    $("#fragCard").onclick=()=>{$("#input").value=`Εξήγησέ μου τη λέξη "${w.w}" με ορισμό, ετυμολογία και 2 παραδείγματα χρήσης.`;autoH($("#input"));$("#input").focus()};
+  } else {
+    const w=WORDS[(day*7+d.getFullYear())%WORDS.length];
+    $("#fN").textContent=w.w;$("#fB").textContent=w.p;$("#fNt").textContent=w.d;
+    $("#fragCard").onclick=()=>{$("#input").value=`What does "${w.w}" mean? Give me 3 example sentences and explain when to use it.`;autoH($("#input"));$("#input").focus()};
+  }
+}
+
+// ── I18N ──────────────────────────────────────────────────────
+function applyI18n(){
+  const l=S.s.lang;
+  $$("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(I18N[l][k])el.textContent=I18N[l][k]});
+  renderSubjBar();
+  $("#langBtn").textContent=l==="en"?"EN":"ΕΛ";
+  const ta=$("#input");if(ta)ta.placeholder=l==="en"?"Ask NOEMA anything...":"Τι θες να μάθεις;";
+  const pn=$("#pName");if(pn)pn.placeholder=I18N[l].pNamePh||"Name";
+  const pp=$("#pPrompt");if(pp)pp.placeholder=I18N[l].pPromptPh||"Instructions for NOEMA...";
+  const am=$("#aboutMe");if(am)am.placeholder=l==="en"?"Tell NOEMA a little about you — your interests, how you like to be helped, anything relevant...":"Πες στη NOEMA λίγα για σένα — τα ενδιαφέροντά σου, πώς θέλεις να σε βοηθά...";
+}
+
+// ── THREADS ───────────────────────────────────────────────────
+function newThread(){_clearSearch();const t={id:uid(),title:tr("untitled"),messages:[],pid:S.ap,ts:Date.now()};S.threads.unshift(t);S.aid=t.id;save();renderThreads();renderMsgs()}
+function delThread(id){S.threads=S.threads.filter(t=>t.id!==id);if(S.aid===id)S.aid=S.threads[0]?.id||null;save();renderThreads();renderMsgs()}
+function selThread(id){S.aid=id;const t=at();if(t?.pid)S.ap=t.pid;save();renderThreads();renderMsgs();renderChip()}
+function renderThreads(){
+  if(_srMode)return;
+  const w=$("#threads");w.innerHTML="";
+  S.threads.forEach(t=>{
+    const el=document.createElement("div");el.className="thread"+(t.id===S.aid?" on":"");
+    const nm=document.createElement("div");nm.className="t-name";nm.textContent=t.title;
+    nm.ondblclick=e=>{e.stopPropagation();const inp=document.createElement("input");inp.className="t-inp";inp.value=t.title;inp.onblur=()=>{t.title=(inp.value||"").trim()||tr("untitled");save();renderThreads()};inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=t.title;inp.blur()}};nm.replaceWith(inp);inp.focus();inp.select()};
+    const d=document.createElement("button");d.className="t-del";d.textContent="✕";d.onclick=e=>{e.stopPropagation();if((t.messages||[]).length>10&&!confirm("Delete?"))return;delThread(t.id)};
+    el.onclick=()=>selThread(t.id);
+    el.append(nm);
+    if(t.pid&&t.pid!=="default"){const p=S.personas.find(x=>x.id===t.pid);if(p){const b=document.createElement("span");b.className="t-pid";b.textContent=(p.name||"?")[0].toUpperCase();el.appendChild(b);}}
+    el.appendChild(d);w.append(el);
+  });
+}
+
+// ── MESSAGES ─────────────────────────────────────────────────
+function renderMsgs(){
+  const w=$("#msgsIn");w.innerHTML="";
+  const t=at();if(!t||!t.messages.length){w.appendChild(mkEmpty());return}
+  t.messages.forEach(m=>w.appendChild(mkMsg(m)));scrollBot();
+}
+function mkEmpty(){
+  const el=document.createElement("div");el.className="empty";
+  const pool=S.s.greekStudent?GREEK_PROPHECIES:PROPHECIES;
+  const pi=Math.floor(Date.now()/40e3)%pool.length;
+  const tag=S.s.greekStudent?"NOEMA · Ελληνική Μαθητική Λειτουργία":"NOEMA · Personal Intelligence";
+  el.innerHTML=`
+    <svg class="empty-icon" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="36" cy="36" r="32" stroke="rgba(255,255,255,0.08)" stroke-width="0.8"/>
+      <path d="M18 54V18L54 54V18" stroke="rgba(255,255,255,0.82)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="36" cy="36" r="3.8" fill="rgba(255,255,255,0.8)"/>
+    </svg>
+    <p class="empty-q">${pool[pi]}</p>
+    <div class="empty-tag">${tag}</div>`;
+  return el;
+}
+function mkMsg(m){
+  const el=document.createElement("div");el.className="msg "+(m.role==="user"?"user":"ai");el.dataset.id=m.id;
+  const who=document.createElement("div");who.className="msg-who";who.textContent=m.role==="user"?"You":"NOEMA";
+  el.appendChild(who);
+  if(m.images?.length){const ig=document.createElement("div");ig.className="msg-imgs";m.images.forEach(s=>{const i=document.createElement("img");i.src=s;ig.appendChild(i)});el.appendChild(ig)}
+  if(m.thinking){const tb=document.createElement("div");tb.className="think";tb.innerHTML=`<div class="think-hd"><span>Thinking</span><span>▾</span></div><div class="think-body"></div>`;tb.querySelector(".think-body").textContent=m.thinking;tb.onclick=()=>tb.classList.toggle("open");el.appendChild(tb)}
+  const b=document.createElement("div");b.className="bubble";b.textContent=m.content||"";el.appendChild(b);
+  if(m.content)renderMath(b);
+  if(m.role==="assistant"&&m.content){
+    const acts=document.createElement("div");acts.className="msg-acts";
+    const cp=document.createElement("button");cp.className="mact";cp.textContent="copy";cp.onclick=()=>navigator.clipboard.writeText(m.content);
+    const sp=document.createElement("button");sp.className="mact";sp.textContent="speak";sp.onclick=()=>speakText(m.content);
+    acts.append(cp,sp);el.appendChild(acts);
+  }
+  return el;
+}
+function scrollBot(){const w=$("#msgs");w.scrollTop=w.scrollHeight}
+
+// ── MODELS ────────────────────────────────────────────────────
+let _modelsLoaded = false;
+
+function setOllamaErr(on){
+  const btn=$("#modelRefresh");if(!btn)return;
+  btn.classList.toggle("ollama-err",on);
+  btn.title=on?"Ollama is offline — click to retry":"Reload models";
+}
+
+function setSelError(msg){
+  const sel=$("#modelSel");
+  sel.innerHTML='';
+  const o=document.createElement("option");
+  o.value="__retry__";o.textContent="⟳  "+msg;
+  sel.appendChild(o);
+  sel.onchange=()=>{ if(sel.value==="__retry__") loadModels(); };
+}
+
+async function loadModels(attempt=0){
+  const sel=$("#modelSel");
+  if(attempt===0){
+    sel.innerHTML='';
+    const o=document.createElement("option");o.disabled=true;o.selected=true;
+    o.textContent="Loading models…";sel.appendChild(o);
+    sel.onchange=null;
+  }
+  try{
+    const r=await fetch("/api/models",{headers:apiHeaders()});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const{models=[]}=await r.json();
+    if(!models.length){
+      setSelError("No models found. Open Ollama and pull a model first.");
+      return;
+    }
+    // ✓ success — populate selector
+    sel.innerHTML="";
+    models.sort((a,b)=>a.name.localeCompare(b.name));
+    models.forEach(m=>{
+      const o=document.createElement("option");o.value=m.name;o.textContent=m.name;sel.appendChild(o);
+    });
+    if(S.model&&models.some(m=>m.name===S.model)) sel.value=S.model;
+    else{ S.model=sel.value; save(); }
+    sel.onchange=()=>{ S.model=sel.value; save(); };
+    _modelsLoaded=true;
+    setOllamaErr(false);
+  }catch{
+    setOllamaErr(true);
+    if(attempt<5){
+      const wait=[2000,3000,4000,5000,7000][attempt];
+      if(attempt===0) setSelError("Starting Ollama…");
+      else            setSelError("Retrying… ("+attempt+"/5)");
+      setTimeout(()=>loadModels(attempt+1), wait);
+    } else {
+      setSelError("Tap here to retry");
+      toast("Can't reach Ollama. Make sure Ollama.app is open, then tap ⟳ next to the model selector.",12000);
+    }
+  }
+}
+
+function bindModelRetry(){
+  // ⟳ button always forces a fresh load
+  $("#modelRefresh").onclick=()=>loadModels();
+}
+
+// ── REMOTE URL ────────────────────────────────────────────────
+async function checkTunnel(){
+  try{
+    const r=await fetch("/api/tunnel",{headers:apiHeaders()});
+    const{url}=await r.json();
+    if(url){
+      const badge=$("#remoteBadge");
+      badge.classList.add("show");
+      $("#remoteBadgeText").textContent="📱 Phone ready";
+      badge.onclick=()=>{navigator.clipboard.writeText(url);toast("Phone URL copied! Open it on your phone.",4000)};
+    }
+  }catch{}
+}
+
+// ── TOOL CALL ICONS ───────────────────────────────────────────
+const TOOL_ICONS = {
+  search_web: `<svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  list_files: `<svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>`,
+  read_file:  `<svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  notify:     `<svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  remember:   `<svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/><path d="M12 8v4l3 3"/></svg>`,
+};
+const TOOL_LABELS = {
+  search_web:"Searching the web",list_files:"Listing files",read_file:"Reading file",
+  notify:"Sending notification",remember:"Saving to memory",
+};
+function mkToolBubble(name, args, done=false) {
+  const el = document.createElement("div");
+  el.className = "tool-call" + (done ? " done" : "");
+  el.dataset.tool = name;
+  const icon  = TOOL_ICONS[name] || TOOL_ICONS.search_web;
+  const label = TOOL_LABELS[name] || name;
+  let argsText = "";
+  if (args.query)    argsText = `"${args.query}"`;
+  else if (args.path)     argsText = args.path;
+  else if (args.app_name) argsText = args.app_name;
+  else if (args.command)  argsText = args.command.slice(0, 60);
+  else if (args.text)     argsText = args.text.slice(0, 60);
+  el.innerHTML = `${icon}<span class="tc-name">${label}</span>${argsText ? `<span class="tc-args">${argsText}</span>` : ""}`;
+  return el;
+}
+
+// ── CHAT ──────────────────────────────────────────────────────
+let ctrl=null;
+let isStreaming=false;
+let _genTimer=null,_genStart=0,_genSlowTimer=null;
+const TOOL_PHASES={web_search:"Searching the web…",web_fetch:"Reading page…",shell:"Running command…",file_read:"Reading file…",screenshot:"Capturing screen…",app_open:"Opening app…",remember:"Saving memory…"};
+function genBarOn(phase){
+  const bar=$("#genBar");if(!bar)return;
+  bar.classList.add("on");
+  const ph=$("#genPhase");if(ph)ph.textContent=phase||"Thinking…";
+  _genStart=Date.now();
+  clearInterval(_genTimer);clearTimeout(_genSlowTimer);
+  _genTimer=setInterval(()=>{const el=$("#genSecs");if(el)el.textContent=((Date.now()-_genStart)/1000).toFixed(1)+"s";},100);
+  _genSlowTimer=setTimeout(()=>{
+    genBarPhase("Still working…");
+    toast("NOEMA is taking a while. If it seems stuck, press Esc to stop and try again.",7000);
+  },30000);
+}
+function genBarPhase(phase){const el=$("#genPhase");if(el)el.textContent=phase;}
+function genBarOff(){
+  clearInterval(_genTimer);_genTimer=null;clearTimeout(_genSlowTimer);_genSlowTimer=null;
+  const bar=$("#genBar");if(bar)bar.classList.remove("on");
+  const el=$("#genSecs");if(el)el.textContent="";
+}
+
+async function killAll(level="pause"){
+  if(ctrl)ctrl.abort();
+  try{
+    await fetch("/api/kill",{
+      method:"POST",
+      headers:apiHeaders(),
+      body:JSON.stringify({level})
+    });
+  }catch{}
+  isStreaming=false;
+  genBarOff();
+  if(level==="kill"||level==="nuke"){
+    toast(level==="nuke"?"☢ Server nuked. Close and reopen the app.":"⚡ Server killed. Close and reopen the app.",10000);
+  }
+}
+
+async function send(text,images=[]){
+  if(!S.aid)newThread();const th=at();if(!th)return;
+  if(!text&&!images.length)return;
+  if(!S.model||!_modelsLoaded){toast("No model selected — tap ⟳ next to the model selector first.",5000);loadModels();return;}
+  const persona=S.personas.find(p=>p.id===S.ap)||S.personas[0];
+  const um={id:uid(),role:"user",content:text,images,ts:Date.now()};
+  th.messages.push(um);
+  const _isFirst=th.messages.filter(m=>m.role==="user").length===1&&!!text;
+  if(_isFirst)th.title=text.slice(0,44)+(text.length>44?"…":"");
+  const _titleTid=th.id,_titleTxt=text,_titleMdl=S.model||"";
+  th.pid=S.ap;save();renderThreads();renderMsgs();playSend();
+
+  const am={id:uid(),role:"assistant",content:"",thinking:"",ts:Date.now()};
+  th.messages.push(am);
+  const w=$("#msgsIn");
+
+  // Placeholder
+  const aiEl=mkMsg(am);aiEl.dataset.streaming="1";
+  const bub=aiEl.querySelector(".bubble");
+  bub.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  w.appendChild(aiEl);scrollBot();
+  isStreaming=true;
+  genBarOn("Thinking…");
+
+  // Build message list for backend
+  const msgs=[];
+  const _uctx=buildUserContext();
+  const _sysParts=[_uctx,persona.prompt].filter(Boolean);
+  if(_sysParts.length)msgs.push({role:"system",content:_sysParts.join("\n\n")});
+  th.messages.forEach(m=>{
+    if(m.id===am.id)return;
+    const e={role:m.role,content:m.content||""};
+    if(m.images?.length)e.images=m.images.map(d=>d.replace(/^data:image\/[^;]+;base64,/,""));
+    msgs.push(e);
+  });
+
+  ctrl=new AbortController();
+  // Hard timeout: abort after 3 min if nothing completes (covers hung webview connections)
+  const _toAc=new AbortController();
+  const _toId=setTimeout(()=>_toAc.abort("timeout"),180000);
+  const _sig=AbortSignal.any?AbortSignal.any([ctrl.signal,_toAc.signal]):ctrl.signal;
+  let full="",think="",started=false;
+
+  try{
+    const res=await fetch("/api/chat",{
+      method:"POST",
+      headers:apiHeaders(),
+      body:JSON.stringify({model:S.model,messages:msgs,think:!!S.s.thinking,student_mode:!!S.s.greekStudent}),
+      signal:_sig,
+    });
+    clearTimeout(_toId);
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    setOllamaErr(false);
+
+    const reader=res.body.getReader();
+    const dec=new TextDecoder();
+    let buf="";
+
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n");buf=lines.pop()||"";
+      for(const ln of lines){
+        if(!ln.trim())continue;
+        let o;
+        try{o=JSON.parse(ln)}catch{continue}
+
+        // Custom backend events
+        if(o._type==="tool_start"){
+          if(!started){started=true;bub.innerHTML=""}
+          genBarPhase(TOOL_PHASES[o.name]||o.name+"…");
+          w.appendChild(mkToolBubble(o.name,o.args||{}));
+          scrollBot();continue;
+        }
+        if(o._type==="tool_done"){
+          genBarPhase("Writing…");
+          const bubbles=[...w.querySelectorAll(`.tool-call[data-tool="${o.name}"]`)];
+          if(bubbles.length)bubbles[bubbles.length-1].classList.add("done");
+          scrollBot();continue;
+        }
+        if(o._type==="killed"){bub.textContent="[stopped]";break}
+        if(o._type==="error"){toast(o.message||tr("errOllama"),6e3);bub.textContent="...";break}
+
+        // Regular Ollama stream chunks
+        if(o.message){
+          if(o.message.thinking){think+=o.message.thinking;if(!started)genBarPhase("Reasoning…");}
+          if(o.message.content){full+=o.message.content;if(!started)genBarPhase("Writing…");}
+        }
+        if(!started&&(full||think)){started=true;bub.innerHTML=""}
+        streamUp(aiEl,full,think);
+      }
+    }
+  }catch(e){
+    clearTimeout(_toId);
+    if(e.name!=="AbortError"){
+      const isTimeout=e.message==="timeout"||String(e).includes("timeout");
+      toast(isTimeout?"NOEMA timed out. Check that Ollama is running and try again.":tr("errOllama"),7e3);
+      bub.textContent="…";
+      setOllamaErr(true);
+    }
+  }finally{
+    clearTimeout(_toId);
+    am.content=full;am.thinking=think;save();
+    isStreaming=false;
+    genBarOff();
+    ctrl=null;
+    const fin=mkMsg(am);aiEl.replaceWith(fin);
+    scrollBot();
+    if(S.s.voice&&full)speakText(full);
+    if(_isFirst&&_titleTxt){
+      fetch("/api/title",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:_titleTxt,model:_titleMdl})})
+        .then(r=>r.json()).then(d=>{if(d.title){const _t=S.threads.find(t=>t.id===_titleTid);if(_t){_t.title=d.title;save();renderThreads();}}}).catch(()=>{});
+    }
+  }
+}
+
+function streamUp(el,text,thinking){
+  const bub=el.querySelector(".bubble");
+  if(thinking){
+    let tb=el.querySelector(".think");
+    if(!tb){tb=document.createElement("div");tb.className="think open";tb.innerHTML=`<div class="think-hd"><span>Thinking</span><span>▾</span></div><div class="think-body"></div>`;tb.onclick=()=>tb.classList.toggle("open");el.insertBefore(tb,bub)}
+    tb.querySelector(".think-body").textContent=thinking;
+  }
+  bub.textContent=text;scrollBot();
+}
+
+// ── AUDIO ─────────────────────────────────────────────────────
+let aCtx=null;const gCtx=()=>{if(!aCtx)aCtx=new(window.AudioContext||window.webkitAudioContext)();return aCtx};
+function playSend(){
+  if(!S.s.sound)return;
+  try{const ctx=gCtx(),now=ctx.currentTime,dur=0.38;const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<d.length;i++){const e=Math.pow(Math.max(0,1-i/d.length),1.3),a=Math.min(1,i/(ctx.sampleRate*0.007));d[i]=(Math.random()*2-1)*e*a*0.28}const src=ctx.createBufferSource();src.buffer=buf;const f1=ctx.createBiquadFilter();f1.type="highpass";f1.frequency.value=2800;const f2=ctx.createBiquadFilter();f2.type="lowpass";f2.frequency.value=7500;const g=ctx.createGain();g.gain.setValueAtTime(.55,now);g.gain.exponentialRampToValueAtTime(.01,now+dur);src.connect(f1).connect(f2).connect(g).connect(ctx.destination);src.start(now);}catch{}
+}
+
+// ── VOICE ─────────────────────────────────────────────────────
+let voices=[];const loadV=()=>{voices=speechSynthesis.getVoices()};
+if(typeof speechSynthesis!=="undefined"){loadV();speechSynthesis.onvoiceschanged=loadV}
+function pickV(){
+  const prefer=S.s.lang==="gr"?["Melina","Anna"]:["Karen","Samantha","Serena","Tessa","Moira","Fiona","Google UK English Female"];
+  for(const n of prefer){const v=voices.find(v=>v.name.includes(n));if(v)return v}
+  return voices.find(v=>/en/.test(v.lang))||voices[0];
+}
+let rotNode=null;
+function startRot(){try{const ctx=gCtx();stopRot();const sz=ctx.sampleRate*2,buf=ctx.createBuffer(1,sz,ctx.sampleRate),d=buf.getChannelData(0);for(let i=0;i<sz;i++)d[i]=(Math.random()*2-1)*0.07;const src=ctx.createBufferSource();src.buffer=buf;src.loop=true;const f=ctx.createBiquadFilter();f.type="bandpass";f.frequency.value=1600;f.Q.value=0.5;const g=ctx.createGain();g.gain.value=0.12;src.connect(f).connect(g).connect(ctx.destination);src.start();rotNode={src}}catch{}}
+function stopRot(){if(rotNode){try{rotNode.src.stop()}catch{}rotNode=null}}
+function speakText(text){
+  try{speechSynthesis.cancel();const clean=text.replace(/```[\s\S]*?```/g,". ").replace(/[*_#`]/g,"").trim();if(!clean)return;const chunks=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[clean];const v=pickV();if(S.s.rot)startRot();let i=0;const next=()=>{if(i>=chunks.length){stopRot();return}const u=new SpeechSynthesisUtterance(chunks[i++].trim());if(v)u.voice=v;u.rate=.87;u.pitch=.76;u.volume=1;u.onend=next;u.onerror=next;speechSynthesis.speak(u)};next()}catch{}
+}
+
+// ── MIC ───────────────────────────────────────────────────────
+let recog=null,recOn=false;
+function toggleMic(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast("Voice input not supported here.");return}
+  if(!recog){recog=new SR();recog.continuous=true;recog.interimResults=true;let committed="";recog.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)committed+=t+" ";else interim+=t}$("#input").value=(committed+interim).trim();autoH($("#input"))};recog.onend=()=>{if(recOn)try{recog.start()}catch{}};recog.onerror=()=>{recOn=false;$("#micBtn").classList.remove("on")}}
+  recog.lang=S.s.lang==="gr"?"el-GR":"en-US";
+  if(recOn){recOn=false;$("#micBtn").classList.remove("on");try{recog.stop()}catch{}}else{recOn=true;$("#micBtn").classList.add("on");try{recog.start()}catch{}}
+}
+
+// ── IMAGES ────────────────────────────────────────────────────
+const pending=[];
+function addImgs(files){Array.from(files).forEach(f=>{if(!f.type.startsWith("image/"))return;const r=new FileReader();r.onload=()=>{pending.push(r.result);renderPrev()};r.readAsDataURL(f)})}
+function renderPrev(){const w=$("#imgPrev");w.innerHTML="";pending.forEach((s,i)=>{const d=document.createElement("div");d.className="ipw";const img=document.createElement("img");img.src=s;const rm=document.createElement("button");rm.className="ip-rm";rm.textContent="×";rm.onclick=()=>{pending.splice(i,1);renderPrev()};d.append(img,rm);w.append(d)})}
+
+// ── PERSONAS ──────────────────────────────────────────────────
+function renderPersonas(){
+  const w=$("#pList");if(!w)return;w.innerHTML="";
+  S.personas.forEach(p=>{
+    const el=document.createElement("div");el.className="pc"+(p.id===S.ap?" on":"");
+    const av=document.createElement("div");av.className="pc-av";av.textContent=(p.name||"?")[0].toUpperCase();
+    const nm=document.createElement("div");nm.className="pc-name";nm.textContent=(S.s.greekStudent&&p.name_gr)||p.name;
+    const ds=document.createElement("div");ds.className="pc-desc";ds.textContent=(S.s.greekStudent&&p.desc_gr)||p.desc||"";
+    el.append(av,nm,ds);
+    if(!p.builtin){const d=document.createElement("button");d.className="pc-del";d.textContent="✕";d.onclick=e=>{e.stopPropagation();if(confirm("Delete?")){{S.personas=S.personas.filter(x=>x.id!==p.id);if(S.ap===p.id)S.ap="default";save();renderPersonas();renderChip()}}};el.appendChild(d)}
+    el.onclick=()=>{S.ap=p.id;const t=at();if(t)t.pid=p.id;save();renderPersonas();renderChip()};
+    w.appendChild(el);
+  });
+  const am=$("#aboutMe");if(am&&!am.dataset.bound){am.value=S.profile?.aboutMe||"";am.oninput=updateCtxPreview;am.dataset.bound="1";}
+  else if(am)am.value=S.profile?.aboutMe||"";
+  updateCtxPreview();
+}
+function renderSubjBar(){
+  const l=S.s.lang;
+  $$(".subj-btn").forEach(b=>{
+    b.textContent=l==="gr"?(b.dataset.gr||b.dataset.en):(b.dataset.en||b.dataset.gr);
+    b.classList.toggle("on",b.dataset.pid===S.ap);
+  });
+}
+function renderChip(){
+  const p=S.personas.find(x=>x.id===S.ap)||{id:"default",name:"NOEMA",desc:"Your personal intelligence",name_gr:"NOEMA",desc_gr:"Ο έξυπνος βοηθός σου."};
+  const gr=S.s.greekStudent;
+  const dispName=(gr&&p.name_gr)||p.name||"NOEMA";
+  const dispDesc=(gr&&p.desc_gr)||p.desc||(gr?"Για ό,τι χρειαστείς.":"Your personal intelligence");
+  const c=$("#pChip");
+  if(c){if(p.id==="default"){c.style.display="none";}else{c.style.display="flex";c.textContent="⟡ "+dispName;}}
+  const av=$("#sbPersonaAv"),nm=$("#sbPersonaName"),ds=$("#sbPersonaDesc"),sb=$("#sbPersona");
+  if(av)av.textContent=(dispName||"N")[0].toUpperCase();
+  if(nm)nm.textContent=dispName;
+  if(ds)ds.textContent=dispDesc;
+  if(sb)sb.className="sb-persona"+(p.id!=="default"?" lit":"");
+}
+function addPersona(){const n=$("#pName").value.trim(),pr=$("#pPrompt").value.trim();if(!n||!pr)return;const p={id:uid(),name:n,desc:pr.slice(0,55)+(pr.length>55?"…":""),prompt:pr,builtin:false};S.personas.push(p);S.ap=p.id;save();$("#pName").value="";$("#pPrompt").value="";renderPersonas();renderChip()}
+
+// ── SETTINGS ─────────────────────────────────────────────────
+function renderSettings(){
+  $("#togThink").classList.toggle("on",!!S.s.thinking);
+  $("#togVoice").classList.toggle("on",!!S.s.voice);
+  $("#togRot").classList.toggle("on",!!S.s.rot);
+  $("#togSend").classList.toggle("on",!!S.s.sound);
+}
+function bindSettings(){
+  const tog=(id,k)=>$(id).onclick=()=>{S.s[k]=!S.s[k];save();renderSettings()};
+  tog("#togThink","thinking");tog("#togVoice","voice");tog("#togRot","rot");tog("#togSend","sound");
+  $("#voiceTestBtn").onclick=()=>speakText(S.s.lang==="gr"?"Η σκέψη αρχίζει.":"The mind stirs. I am listening.");
+  $("#wtReplayBtn").onclick=()=>{
+    $("#settingsModal").classList.remove("open");
+    localStorage.removeItem(WT_KEY);
+    startWalkthrough(true);
+  };
+  $("#memClearBtn").onclick=async()=>{
+    if(!confirm("Clear all memories? NOEMA will forget everything it has saved."))return;
+    await fetch("/api/memory/clear",{method:"POST"});
+    renderMemory([]);
+  };
+}
+
+async function loadMemory(){
+  try{
+    const r=await fetch("/api/memory");
+    const d=await r.json();
+    renderMemory(d.memories||[]);
+  }catch(e){}
+}
+
+function renderMemory(memories){
+  const list=$("#memList"),empty=$("#memEmpty");
+  if(!list)return;
+  list.innerHTML="";
+  if(!memories.length){
+    list.style.display="none";
+    if(empty)empty.style.display="block";
+    return;
+  }
+  list.style.display="flex";
+  if(empty)empty.style.display="none";
+  memories.slice().reverse().forEach(m=>{
+    const row=document.createElement("div");
+    row.style.cssText="display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px";
+    const txt=document.createElement("span");
+    txt.style.cssText="flex:1;opacity:0.9;line-height:1.45";
+    txt.textContent=m.text;
+    const del=document.createElement("button");
+    del.textContent="×";
+    del.style.cssText="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;line-height:1;padding:0 2px;flex-shrink:0";
+    del.title="Forget this";
+    del.onclick=async()=>{
+      await fetch(`/api/memory/${m.id}`,{method:"DELETE"});
+      row.remove();
+      const remaining=list.querySelectorAll("div");
+      if(!remaining.length){list.style.display="none";if(empty)empty.style.display="block";}
+    };
+    row.appendChild(txt);row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+// ── GREEK STUDENT MODE ────────────────────────────────────────
+function applyGreekStudent(on){
+  document.body.classList.toggle("greek-student",on);
+  const btn=$("#greekStudentBtn"),lbl=$("#gsBtnLabel");
+  if(btn){
+    btn.style.background=on?"#3a6fa0":"";
+    btn.style.color=on?"#e8eef8":"#4a9eff";
+    btn.title=on?"Απενεργοποίηση μαθητικής λειτουργίας":"Ελληνικός Μαθητής / Greek Student Mode";
+  }
+  if(lbl)lbl.textContent=on?"✓ ΕΛ ΜΑΘΗΤΗΣ":"ΕΛ ΜΑΘΗΤΗΣ";
+  if(on&&S.s.lang!=="gr"){S.s.lang="gr";applyI18n();}
+  if(!on&&S.s.lang==="gr"){S.s.lang="en";applyI18n();}
+  renderWord();
+  renderChip();
+  renderMsgs();
+  setSub();
+}
+
+// ── EVENTS ────────────────────────────────────────────────────
+function autoH(ta){ta.style.height="auto";ta.style.height=Math.min(200,ta.scrollHeight)+"px"}
+function handleSend(){const text=$("#input").value.trim();if(!text&&!pending.length)return;const imgs=pending.splice(0);renderPrev();$("#input").value="";autoH($("#input"));send(text,imgs)}
+function bindAll(){
+  $("#newBtn").onclick=newThread;
+  $("#subjBar").onclick=e=>{
+    const btn=e.target.closest(".subj-btn");if(!btn)return;
+    const pid=btn.dataset.pid;
+    const p=S.personas.find(x=>x.id===pid);if(!p)return;
+    S.ap=pid;save();
+    const cur=at();
+    if(!cur||cur.messages.length>0)newThread();
+    else{cur.pid=pid;renderMsgs();}
+    renderSubjBar();renderChip();
+    const name=(S.s.greekStudent&&p.name_gr)||p.name;
+    toast(name,1200);
+    setTimeout(()=>$("#input").focus(),80);
+  };
+  $("#settingsBtn").onclick=()=>{renderSettings();loadMemory();$("#settingsModal").classList.add("open")};
+  $("#greekStudentBtn").onclick=()=>{S.s.greekStudent=!S.s.greekStudent;save();applyGreekStudent(S.s.greekStudent)};
+  $("#sbPersona").onclick=()=>{renderPersonas();$("#personasModal").classList.add("open")};
+  $("#auditBtn").onclick=openAudit;
+  $$("[data-close]").forEach(b=>b.onclick=()=>{closeAudit();$$(".ovl").forEach(o=>o.classList.remove("open"))});
+  $$(".ovl").forEach(o=>o.onclick=e=>{if(e.target===o){closeAudit();o.classList.remove("open")}});
+  $("#addPBtn").onclick=addPersona;
+  $("#pChip").onclick=()=>{renderPersonas();$("#personasModal").classList.add("open")};
+  $("#saveAboutBtn").onclick=()=>{
+    const ta=$("#aboutMe");if(!ta)return;
+    S.profile={...S.profile,aboutMe:ta.value.trim()};
+    save();updateCtxPreview();toast("Saved.",1400);
+  };
+  $("#retuneBtn").onclick=()=>{
+    $$(".ovl").forEach(o=>o.classList.remove("open"));
+    setTimeout(()=>showQuiz(()=>{renderPersonas();renderChip();}),200);
+  };
+  $("#langBtn").onclick=()=>{S.s.lang=S.s.lang==="en"?"gr":"en";save();applyI18n()};
+  $("#examTrigger").onclick=eqOpen;
+  $("#eqClose").onclick=eqClose;
+  $("#exportBtn").onclick=exportThread;
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#eqModal")?.style.display!=="none")eqClose();});
+  $("#imgBtn").onclick=()=>$("#fileIn").click();
+  $("#fileIn").onchange=e=>addImgs(e.target.files);
+  $("#micBtn").onclick=toggleMic;
+  $("#sendBtn").onclick=handleSend;
+  const inp=$("#input");
+  inp.addEventListener("input",()=>autoH(inp));
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handleSend()}});
+  document.addEventListener("dragover",e=>e.preventDefault());
+  document.addEventListener("drop",e=>{if(e.dataTransfer?.files?.length){e.preventDefault();addImgs(e.dataTransfer.files)}});
+  document.addEventListener("paste",e=>{if(!e.clipboardData)return;const files=[...e.clipboardData.items].filter(i=>i.type.startsWith("image/")).map(i=>i.getAsFile());if(files.length)addImgs(files)});
+}
+
+// ── SEARCH ────────────────────────────────────────────────────
+let _searchIdx  = null;
+let _srDirty    = true;   // rebuild index before next search query
+let _srDebounce = null;
+let _srMode     = false;  // true while search results are showing
+
+function buildSearchIndex() {
+  if (!window.FlexSearch) return;
+  _searchIdx = new FlexSearch.Document({
+    tokenize: "forward",
+    resolution: 9,
+    document: { id: "id", index: ["content"] }
+  });
+  S.threads.forEach(t => {
+    _searchIdx.add({ id: "T" + t.id, content: t.title || "" });
+    (t.messages || []).forEach(m => {
+      if (m.content) _searchIdx.add({ id: "M" + t.id + "~" + m.id, content: m.content });
+    });
+  });
+  _srDirty = false;
+}
+
+function _srDoc(docId) {
+  if (docId[0] === "T") {
+    const tid = docId.slice(1);
+    const t   = S.threads.find(x => x.id === tid);
+    return t ? { threadId: tid, msgId: null, snippet: t.title, title: t.title } : null;
+  }
+  if (docId[0] === "M") {
+    const sep = docId.indexOf("~");
+    const tid = docId.slice(1, sep);
+    const mid = docId.slice(sep + 1);
+    const t   = S.threads.find(x => x.id === tid);  if (!t) return null;
+    const m   = (t.messages || []).find(x => x.id === mid);
+    if (!m) return null;
+    return { threadId: tid, msgId: mid, snippet: (m.content || "").slice(0, 160), title: t.title };
+  }
+  return null;
+}
+
+function _hlMatch(text, q) {
+  const safe  = escHtml(text);
+  const words = q.trim().split(/\s+/).filter(Boolean)
+                  .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (!words.length) return safe;
+  return safe.replace(new RegExp("(" + words.join("|") + ")", "gi"), "<mark>$1</mark>");
+}
+
+function doSearch(q) {
+  const wrap = $("#threads");
+  const hd   = $(".threads-hd");
+  if (!q.trim()) {
+    _srMode = false;
+    hd.style.display = "";
+    renderThreads();
+    return;
+  }
+  _srMode = true;
+  hd.style.display = "none";
+  // Lazy-rebuild index when stale (new messages saved since last build)
+  if (_srDirty || !_searchIdx) buildSearchIndex();
+  if (!_searchIdx) {
+    wrap.innerHTML = '<div class="sr-empty">Search not available — FlexSearch failed to load.</div>';
+    return;
+  }
+  const raw  = _searchIdx.search(q, { limit: 30 });
+  const seen = new Set();
+  const ids  = [];
+  raw.forEach(r => (r.result || []).forEach(id => { if (!seen.has(id)) { seen.add(id); ids.push(id); } }));
+  wrap.innerHTML = "";
+  if (!ids.length) {
+    wrap.innerHTML = `<div class="sr-empty">No results for <em>&ldquo;${escHtml(q)}&rdquo;</em></div>`;
+    return;
+  }
+  // Title matches first, then message matches — cap at 22
+  const ordered = [...ids.filter(x => x[0] === "T"), ...ids.filter(x => x[0] === "M")].slice(0, 22);
+  ordered.forEach(docId => {
+    const d = _srDoc(docId);
+    if (!d) return;
+    const el = document.createElement("div");
+    el.className = "sr-item";
+    const isTitle = docId[0] === "T";
+    el.innerHTML = `
+      <div class="sr-thread">${escHtml((d.title || "").slice(0, 40))}</div>
+      <div class="sr-snippet">${isTitle
+        ? '<em style="color:var(--text3);font-size:11px">Title match</em>'
+        : _hlMatch(d.snippet, q)
+      }</div>`;
+    el.onclick = () => { _jumpToResult(d.threadId, d.msgId); _clearSearch(); };
+    wrap.appendChild(el);
+  });
+}
+
+function _jumpToResult(threadId, msgId) {
+  selThread(threadId);
+  if (!msgId) return;
+  // Two rAF frames to ensure renderMsgs has painted before we scroll
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const el = document.querySelector(`.msg[data-id="${msgId}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.classList.add("sr-hl");
+      setTimeout(() => el.classList.remove("sr-hl"), 2000);
+    }
+  }));
+}
+
+function _clearSearch() {
+  const inp = $("#searchInput"); if (inp) inp.value = "";
+  const cl  = $("#searchClear"); if (cl)  cl.style.display = "none";
+  doSearch("");
+}
+
+function bindSearch() {
+  const inp = $("#searchInput");
+  const cl  = $("#searchClear");
+  if (!inp) return;
+  inp.addEventListener("input", () => {
+    cl.style.display = inp.value ? "block" : "none";
+    clearTimeout(_srDebounce);
+    _srDebounce = setTimeout(() => doSearch(inp.value), 240);
+  });
+  cl.addEventListener("click", () => { _clearSearch(); inp.focus(); });
+}
+
+// ── AUDIT LOG ─────────────────────────────────────────────────
+let auditInterval = null;
+let _auditAll = [];  // full fetched list — never mutated
+let _afType = "all", _afStatus = "all", _afTime = "all";
+
+const AUDIT_BADGE = {
+  shell:      ["ae-shell",   "Shell"],
+  file_read:  ["ae-file",    "File"],
+  file_write: ["ae-file",    "Write"],
+  file_list:  ["ae-file",    "List"],
+  web_search: ["ae-web",     "Search"],
+  app_open:   ["ae-app",     "App"],
+  screenshot: ["ae-screen",  "Screen"],
+  applescript:["ae-shell",   "Script"],
+  notify:     ["ae-app",     "Notify"],
+  kill:       ["ae-kill",    "Kill"],
+  session:    ["ae-session", "Session"],
+};
+
+function isHighRisk(e) {
+  return e.approved === "denied" || e.type === "kill" ||
+         (e.result||"").includes("BLOCKED") || (e.result||"").includes("rate limit");
+}
+
+function fmtTs(iso) {
+  try {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}) +
+      "  " + d.toLocaleDateString([],{month:"short",day:"numeric"});
+  } catch { return iso; }
+}
+
+function filterEntries(all) {
+  const now = new Date();
+  return all.filter(e => {
+    if (_afType !== "all") {
+      if (_afType === "file_read" && !["file_read","file_write","file_list"].includes(e.type)) return false;
+      if (_afType !== "file_read" && e.type !== _afType) return false;
+    }
+    if (_afStatus === "success"  && !e.success) return false;
+    if (_afStatus === "blocked"  && e.approved !== "denied") return false;
+    if (_afTime === "today") {
+      const d = new Date(e.ts);
+      if (d.toDateString() !== now.toDateString()) return false;
+    }
+    if (_afTime === "week") {
+      const d = new Date(e.ts);
+      if (now - d > 7 * 864e5) return false;
+    }
+    return true;
+  });
+}
+
+function mkAuditEntry(e) {
+  const el = document.createElement("div");
+  const risk = isHighRisk(e);
+  const denied = e.approved === "denied";
+  el.className = "ae" + (risk ? (denied ? " denied" : " risk") : "") + (e.success===false?" fail":"");
+  const [cls, lbl] = AUDIT_BADGE[e.type] || ["ae-default", e.type || "?"];
+  const hasExtra = !!(e.triggered_by || e.result);
+  el.innerHTML = `
+    <div class="ae-main">
+      <span class="ae-badge ${cls}">${lbl}</span>
+      <div class="ae-right">
+        <div class="ae-ts">${fmtTs(e.ts)}</div>
+        <div class="ae-detail">${escHtml((e.detail||"").slice(0,220))}</div>
+        ${denied ? '<div class="ae-denied">⛔ Blocked</div>' : ""}
+      </div>
+      ${hasExtra ? '<span class="ae-chevron">›</span>' : ""}
+    </div>
+    ${hasExtra ? `<div class="ae-detail-extra">${
+      e.triggered_by ? `<b>Triggered by:</b> ${escHtml(e.triggered_by.slice(0,300))}\n` : ""
+    }${e.result ? `<b>Result:</b> ${escHtml(e.result.slice(0,300))}` : ""}</div>` : ""}`;
+  if (hasExtra) el.onclick = () => el.classList.toggle("expanded");
+  return el;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function exportThread(){
+  const t=at();
+  if(!t||!t.messages.length){toast(S.s.greekStudent?"Δεν υπάρχουν μηνύματα για εξαγωγή.":"No messages to export.",2000);return;}
+  const gr=S.s.greekStudent;
+  const lines=[`NOEMA — ${t.title||"Conversation"}`,"Exported: "+new Date().toLocaleDateString(),"─".repeat(44),""];
+  t.messages.forEach(m=>{
+    if(!m.content)return;
+    lines.push(`[${m.role==="user"?(gr?"Εγώ":"You"):"NOEMA"}]`);
+    lines.push(m.content);
+    lines.push("");
+  });
+  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=((t.title||"noema-chat").replace(/[^a-z0-9]/gi,"-").toLowerCase().replace(/-+/g,"-").slice(0,48))+".txt";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(gr?"Εξαγωγή ολοκληρώθηκε.":"Exported.",1600);
+}
+
+function renderAudit() {
+  const body = $("#auditBody");
+  const empty = $("#auditEmpty");
+  const filtered = filterEntries(_auditAll);
+  // Remove old entries (keep #auditEmpty)
+  [...body.children].forEach(c => { if (c.id !== "auditEmpty") c.remove(); });
+  if (!filtered.length) { empty.style.display="block"; return; }
+  empty.style.display = "none";
+  // Render newest first (already in that order from server)
+  filtered.forEach(e => body.insertBefore(mkAuditEntry(e), empty));
+  // Footer: count
+  const footer = $("#auditFooter");
+  if (footer) footer.textContent = `${filtered.length} of ${_auditAll.length} entries`;
+}
+
+async function loadAudit() {
+  try {
+    const r = await fetch("/api/audit?n=1000", { headers: apiHeaders() });
+    if (!r.ok) return;
+    const { entries=[], log_path="" } = await r.json();
+    _auditAll = entries;
+    renderAudit();
+    const fp = $("#auditFooter");
+    if (fp && log_path) fp.title = log_path;
+  } catch {}
+}
+
+function bindAuditFilters() {
+  // Type filter
+  $("#afType").querySelectorAll(".af-pill").forEach(btn => {
+    btn.onclick = () => {
+      $("#afType").querySelectorAll(".af-pill").forEach(b=>b.classList.remove("on"));
+      btn.classList.add("on");
+      _afType = btn.dataset.val;
+      renderAudit();
+    };
+  });
+  // Status filter
+  $("#afStatus").querySelectorAll(".af-pill").forEach(btn => {
+    btn.onclick = () => {
+      $("#afStatus").querySelectorAll(".af-pill").forEach(b=>b.classList.remove("on"));
+      btn.classList.add("on");
+      _afStatus = btn.dataset.val;
+      renderAudit();
+    };
+  });
+  // Time filter
+  $("#afTime").querySelectorAll(".af-pill").forEach(btn => {
+    btn.onclick = () => {
+      $("#afTime").querySelectorAll(".af-pill").forEach(b=>b.classList.remove("on"));
+      btn.classList.add("on");
+      _afTime = btn.dataset.val;
+      renderAudit();
+    };
+  });
+  // Export
+  $("#auditExport").onclick = () => {
+    const filtered = filterEntries(_auditAll);
+    const lines = filtered.map(e =>
+      `[${e.ts}] [${e.label}] ${e.detail}` +
+      (e.result ? `\n  Result: ${e.result}` : "") +
+      (e.triggered_by ? `\n  Triggered by: ${e.triggered_by}` : "") +
+      `\n  Status: ${e.success?"success":"failed"} | Approved: ${e.approved}`
+    ).join("\n\n");
+    const blob = new Blob(["NOEMA Activity Log Export\n" + new Date().toISOString() + "\n\n" + lines], {type:"text/plain"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "noema-activity-" + new Date().toISOString().slice(0,10) + ".txt";
+    a.click();
+  };
+  // Close
+  $("#auditClose").onclick = closeAudit;
+  // Click outside
+  $("#auditModal").onclick = e => { if (e.target === $("#auditModal")) closeAudit(); };
+}
+
+function openAudit() {
+  loadAudit();
+  $("#auditModal").classList.add("open");
+  auditInterval = setInterval(loadAudit, 4000);
+  bindAuditFilters();
+}
+
+function closeAudit() {
+  clearInterval(auditInterval);
+  auditInterval = null;
+  $("#auditModal").classList.remove("open");
+}
+
+// ── WALKTHROUGH ───────────────────────────────────────────────
+const WT_KEY   = "noema-onboarding-completed";
+const WT_TOTAL = 5;
+let _wtCard = 0;
+
+function startWalkthrough(force = false) {
+  if (!force && (S.walkthroughDone || localStorage.getItem(WT_KEY))) return;
+  _wtCard = 0;
+  _wtRender();
+  const ovl = $("#wtOverlay");
+  ovl.style.display = "flex";
+}
+
+function _finishWalkthrough() {
+  localStorage.setItem(WT_KEY, "true");
+  S.walkthroughDone = true;
+  save(); // persists to server immediately (via debounce → saveToServer)
+  const ovl = $("#wtOverlay");
+  ovl.style.display = "none";
+}
+
+function _wtGo(delta) {
+  const next = _wtCard + delta;
+  if (next < 0 || next >= WT_TOTAL) return;
+  _wtCard = next;
+  _wtRender();
+}
+
+function _wtRender() {
+  // Slide the track: each card occupies 20% of a 500%-wide strip
+  $("#wtTrack").style.transform = `translateX(-${_wtCard * 20}%)`;
+  // Back button: hidden on first card
+  const back = $("#wtBack");
+  back.style.visibility = _wtCard === 0 ? "hidden" : "visible";
+  // Next/Get started label
+  const next = $("#wtNext");
+  next.textContent = _wtCard === WT_TOTAL - 1 ? "Get started" : "Next →";
+  // Progress dots
+  $("#wtDots").querySelectorAll(".wt-dot").forEach((d, i) =>
+    d.classList.toggle("on", i === _wtCard)
+  );
+}
+
+function bindWalkthrough() {
+  // Build progress dots
+  const dotsEl = $("#wtDots");
+  for (let i = 0; i < WT_TOTAL; i++) {
+    const d = document.createElement("button");
+    d.className = "wt-dot" + (i === 0 ? " on" : "");
+    d.setAttribute("aria-label", `Go to step ${i + 1}`);
+    d.onclick = () => { _wtCard = i; _wtRender(); };
+    dotsEl.appendChild(d);
+  }
+  // Navigation
+  $("#wtBack").onclick  = () => _wtGo(-1);
+  $("#wtNext").onclick  = () => { _wtCard === WT_TOTAL - 1 ? _finishWalkthrough() : _wtGo(1); };
+  $("#wtSkip").onclick  = _finishWalkthrough;
+  // Keyboard — only active while walkthrough is visible
+  document.addEventListener("keydown", e => {
+    if ($("#wtOverlay").style.display === "none") return;
+    if (e.key === "ArrowRight" || (e.key === "Enter" && e.target.id !== "input")) {
+      e.preventDefault();
+      _wtCard === WT_TOTAL - 1 ? _finishWalkthrough() : _wtGo(1);
+    }
+    if (e.key === "ArrowLeft")  { e.preventDefault(); _wtGo(-1); }
+    if (e.key === "Escape")     { e.preventDefault(); _finishWalkthrough(); }
+  });
+}
+
+// ── BOOT ──────────────────────────────────────────────────────
+function bindKill(){
+  const btn=$("#killBtn");
+  // Single click = Pause
+  btn.onclick=()=>{if(isStreaming)killAll("pause");else$("#killModal").classList.add("open")};
+
+  // Kill level modal buttons
+  $("#killPause").onclick=()=>{killAll("pause");$("#killModal").classList.remove("open");toast("Stopped.",2000)};
+  $("#killKill").onclick =()=>{killAll("kill"); $("#killModal").classList.remove("open")};
+  $("#killNuke").onclick =()=>{killAll("nuke"); $("#killModal").classList.remove("open")};
+
+  document.addEventListener("keydown",e=>{
+    // Escape = Pause current request
+    if(e.key==="Escape"&&isStreaming){e.preventDefault();killAll("pause");toast("Stopped.",2000);return}
+    // Cmd+Shift+Esc = open kill level modal
+    if(e.key==="Escape"&&(e.metaKey||e.ctrlKey)&&e.shiftKey){
+      e.preventDefault();
+      $("#killModal").classList.toggle("open");
+    }
+    // Cmd+R = reload the page
+    if(e.key==="r"&&(e.metaKey||e.ctrlKey)&&!e.shiftKey){
+      e.preventDefault();
+      location.href='/?v='+Date.now();
+    }
+  });
+}
+
+// ── PROFILE QUIZ ──────────────────────────────────────────────
+function showQuiz(onDone){
+  const ovl=$("#quizOverlay");if(!ovl)return;
+  ovl.style.display="flex";
+  let step=0;const answers={};
+  const inner=$("#quizInner");const dots=$("#quizDots");
+  const SIGIL=`<svg class="quiz-sigil" width="42" height="42" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="23.5" stroke="rgba(255,255,255,0.1)" stroke-width="0.8"/><path d="M13 39V13L39 39V13" stroke="rgba(255,255,255,0.88)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26" cy="26" r="2.8" fill="rgba(255,255,255,0.85)"/></svg>`;
+  function go(){
+    inner.style.opacity="0";
+    setTimeout(()=>{
+      if(step>=QUIZ.length){
+        S.profile={...S.profile,...answers,quizDone:true};save();saveToServer();
+        inner.innerHTML=`${SIGIL}<div class="quiz-step" style="margin-bottom:16px">Calibrated</div><div class="quiz-q" style="font-size:17px">NOEMA now knows how to find you.</div><div style="font-size:12.5px;color:var(--text3);margin-bottom:26px;line-height:1.6">You can always retune or add context about yourself from the Personas panel.</div><button class="auth-submit quiz-done-btn" id="quizDoneBtn">Begin</button>`;
+        dots.innerHTML="";
+        inner.style.opacity="1";
+        setTimeout(()=>{const b=$("#quizDoneBtn");if(b)b.onclick=()=>{ovl.style.display="none";if(onDone)onDone();}},30);
+        return;
+      }
+      const q=QUIZ[step];
+      inner.innerHTML=`${SIGIL}<div class="quiz-step">${q.step}</div><div class="quiz-q">${q.q}</div><div class="quiz-opts" id="qOpts"></div>`;
+      const opEl=$("#qOpts");
+      q.opts.forEach(o=>{
+        const b=document.createElement("button");b.className="quiz-opt";
+        b.innerHTML=`<div class="quiz-opt-label">${o.label}</div><div class="quiz-opt-sub">${o.sub}</div>`;
+        b.onclick=()=>{answers[q.key]=o.val;step++;go();};
+        opEl.appendChild(b);
+      });
+      dots.innerHTML="";
+      QUIZ.forEach((_,i)=>{const d=document.createElement("div");d.className="quiz-dot"+(i===step?" on":"");dots.appendChild(d);});
+      inner.style.opacity="1";
+    },180);
+  }
+  $("#quizSkip").onclick=()=>{S.profile={...S.profile,quizDone:true};save();saveToServer();ovl.style.display="none";if(onDone)onDone();};
+  go();
+}
+
+// ── EXAM QUIZ ─────────────────────────────────────────────────
+const EQ_SUBJECTS=[
+  {id:"math",    label:"Μαθηματικά", ico:"∑",  pid:"math"},
+  {id:"physics", label:"Φυσική",     ico:"⚛",  pid:"physics"},
+  {id:"chem",    label:"Χημεία",     ico:"⚗",  pid:"chem"},
+  {id:"history", label:"Ιστορία",    ico:"⚔",  pid:"history"},
+  {id:"essay",   label:"Έκθεση",     ico:"✍",  pid:"essay"},
+  {id:"english", label:"Αγγλικά",    ico:"A",  pid:"greek"},
+];
+
+const EQ_SUBJECTS_EN=[
+  {id:"math",    label:"Math",        ico:"∑",  pid:"math"},
+  {id:"science", label:"Science",     ico:"⚛",  pid:"physics"},
+  {id:"history", label:"History",     ico:"⚔",  pid:"history"},
+  {id:"english", label:"English/Lit", ico:"✍",  pid:"essay"},
+  {id:"bio",     label:"Biology",     ico:"◉",  pid:"chem"},
+  {id:"other",   label:"Other",       ico:"◎",  pid:null},
+];
+
+const EQ_GRADES=[
+  {key:"gymnasio",label:"Γυμνάσιο",grades:["Α'","Β'","Γ'"]},
+  {key:"lykeio",  label:"Λύκειο",  grades:["Α'","Β'","Γ'"]},
+];
+
+const EQ_SUBJ_KEYS={
+  "Μαθηματικά":["Μαθηματικά","Άλγεβρα","Γεωμετρία"],
+  "Φυσική":["Φυσική","Επιστήμη"],
+  "Χημεία":["Χημεία"],
+  "Ιστορία":["Ιστορία"],
+  "Έκθεση":["Έκφραση","Έκθεση","Γλώσσα","Λογοτεχνία"],
+  "Αγγλικά":["Αγγλικά","English"],
+};
+
+const EQ={subj:null,correct:0,total:0,qNum:0,currentQ:"",busy:false};
+let _eqCurriculum=null;
+
+async function eqLoadCurriculum(){
+  if(_eqCurriculum)return;
+  try{const r=await fetch("/api/curriculum");_eqCurriculum=await r.json();}catch{}
+}
+
+function eqGradeLabel(code){
+  if(!code)return"";
+  const[lvl,g]=code.split("_");
+  return`${g} ${lvl==="gymnasio"?"Γυμνάσιο":"Λύκειο"}`;
+}
+
+function eqGetGradeBooks(code,subjLabel){
+  if(!_eqCurriculum||!code)return"";
+  const[lvl,grade]=code.split("_");
+  const books=(_eqCurriculum.levels?.[lvl]?.textbooks?.[grade])||[];
+  const keys=EQ_SUBJ_KEYS[subjLabel]||[subjLabel];
+  const rel=books.filter(b=>keys.some(k=>b.includes(k)));
+  return(rel.length?rel:books.slice(0,3)).join(", ");
+}
+
+function eqMineTopics(subj){
+  const pid=subj.pid;
+  const parts=[];
+  const recent=[...S.threads].reverse().slice(0,12);
+  for(const t of recent){
+    if(pid&&t.pid&&t.pid!==pid)continue;
+    for(const m of(t.messages||[])){
+      if(m.role==="user"&&m.content)parts.push(m.content);
+    }
+  }
+  if(!parts.length)return"";
+  return parts.join(" ").slice(-700);
+}
+
+function eqMineAllTopics(){
+  const parts=[];
+  const recent=[...S.threads].reverse().slice(0,20);
+  for(const t of recent){
+    if(t.pid!=="hw")continue; // only Homework Helper threads
+    for(const m of(t.messages||[])){
+      if(m.role==="user"&&m.content)parts.push(m.content);
+    }
+  }
+  if(!parts.length)return"";
+  return parts.join(" ").slice(-900);
+}
+
+function eqOpen(){
+  if(!S.model||!_modelsLoaded){toast(S.s.greekStudent?"Επίλεξε μοντέλο πρώτα.":"No model selected — tap ⟳ first.",3000);return;}
+  Object.assign(EQ,{subj:null,correct:0,total:0,qNum:0,currentQ:"",busy:false,topicHint:""});
+  const modal=$("#eqModal");modal.style.display="flex";
+  $("#eqScore").style.display="none";
+  if(S.s.greekStudent){
+    eqLoadCurriculum();
+    if(!S.profile?.grade)eqRenderGradePick();
+    else eqRenderPick();
+  } else {
+    eqRenderPickEN();
+  }
+}
+
+function eqClose(){
+  $("#eqModal").style.display="none";
+  Object.assign(EQ,{subj:null,correct:0,total:0,qNum:0,currentQ:"",busy:false,topicHint:""});
+  const s=$("#eqScore");if(s)s.style.display="none";
+}
+
+function eqUpdateScore(){
+  const s=$("#eqScore");
+  s.style.display="block";
+  s.textContent=S.s.greekStudent?`${EQ.correct} / ${EQ.total}`:`${EQ.correct} / ${EQ.total} ✓`;
+}
+
+function eqRenderGradePick(){
+  $("#eqTitle").textContent="ΕΞΕΤΑΣΤΙΚΟ ΚΟΥΙΖ";
+  const inn=$("#eqInner");
+  inn.innerHTML=`<div class="eq-pick-title">Σε ποια τάξη είσαι;</div><div class="eq-pick-sub">Η NOEMA επιλέγει ερωτήσεις κατάλληλες για την τάξη σου και τα μαθήματα που έχεις μελετήσει.</div>`;
+  EQ_GRADES.forEach(grp=>{
+    const g=document.createElement("div");g.className="eq-grade-group";
+    g.innerHTML=`<div class="eq-grade-group-lbl">${grp.label}</div><div class="eq-grade-pills"></div>`;
+    const pills=g.querySelector(".eq-grade-pills");
+    grp.grades.forEach(grade=>{
+      const btn=document.createElement("button");btn.className="eq-grade-pill";btn.textContent=grade;
+      btn.onclick=()=>{S.profile={...(S.profile||{}),grade:`${grp.key}_${grade}`};save();eqRenderPick();};
+      pills.appendChild(btn);
+    });
+    inn.appendChild(g);
+  });
+}
+
+function eqRenderPick(){
+  $("#eqTitle").textContent="ΕΞΕΤΑΣΤΙΚΟ ΚΟΥΙΖ";
+  const grade=S.profile?.grade;
+  const gradeLabel=eqGradeLabel(grade);
+  const inn=$("#eqInner");
+  const gradeLine=gradeLabel?`Τάξη: <b style="color:var(--gold)">${gradeLabel}</b> <button class="eq-grade-change" id="eqChangeGrade">αλλαγή</button><br>`:"";
+  inn.innerHTML=`<div class="eq-pick-title">Επίλεξε μάθημα</div><div class="eq-pick-sub">${gradeLine}Η NOEMA θα επιλέξει ερωτήσεις από το πρόγραμμά σου και θέματα που έχεις μελετήσει.</div><div class="eq-subj-grid" id="eqSubjGrid"></div>`;
+  EQ_SUBJECTS.forEach(s=>{
+    const btn=document.createElement("button");btn.className="eq-subj-btn";
+    btn.innerHTML=`<div class="eq-subj-ico">${s.ico}</div><div class="eq-subj-name">${s.label}</div>`;
+    btn.onclick=()=>eqStartSubject(s);
+    $("#eqSubjGrid").appendChild(btn);
+  });
+  const cg=$("#eqChangeGrade");if(cg)cg.onclick=eqRenderGradePick;
+}
+
+function eqRenderPickEN(){
+  $("#eqTitle").textContent="QUIZ";
+  const inn=$("#eqInner");
+  inn.innerHTML=`<div class="eq-pick-title">Pick a subject</div><div class="eq-pick-sub">NOEMA will generate questions from your class notes and homework sessions. No curriculum — just what you've actually studied.</div><div class="eq-subj-grid" id="eqSubjGrid"></div>`;
+  EQ_SUBJECTS_EN.forEach(s=>{
+    const btn=document.createElement("button");btn.className="eq-subj-btn";
+    btn.innerHTML=`<div class="eq-subj-ico">${s.ico}</div><div class="eq-subj-name">${s.label}</div>`;
+    btn.onclick=()=>eqShowTopicInput(s);
+    $("#eqSubjGrid").appendChild(btn);
+  });
+}
+
+function eqShowTopicInput(subj){
+  EQ.subj=subj;
+  const inn=$("#eqInner");
+  const notes=eqMineAllTopics();
+  const notesHint=notes?`<div class="eq-context-tag" style="margin:0 0 20px">Found notes from your study sessions</div>`:`<div class="eq-context-tag" style="margin:0 0 20px;opacity:.6">No study sessions found yet</div>`;
+  inn.innerHTML=`<div class="eq-pick-title" style="font-size:16px;margin-bottom:6px">${subj.label}</div>${notesHint}<div style="font:600 10px 'Inter',sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Specific topic? <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></div><input id="eqTopicInp" class="eq-ans" style="min-height:auto;padding:10px 14px;font-size:13.5px" placeholder="e.g. photosynthesis, World War II, quadratic equations…" autocomplete="off"/><div style="display:flex;gap:10px;margin-top:12px"><button class="eq-change" style="margin:0;padding:8px 14px;border:1px solid var(--border);border-radius:7px" id="eqBackBtn">← Back</button><button class="eq-submit" id="eqStartBtn">Start Quiz →</button></div>`;
+  const inp=$("#eqTopicInp");
+  const go=()=>{EQ.topicHint=(inp?.value||"").trim();EQ.qNum=0;$("#eqTitle").textContent=subj.label.toUpperCase();eqNextQuestion();};
+  $("#eqStartBtn").onclick=go;
+  if(inp)inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();go();}};
+  $("#eqBackBtn").onclick=()=>{EQ.topicHint="";eqRenderPickEN();};
+  setTimeout(()=>inp?.focus(),50);
+}
+
+function eqStartSubject(subj){
+  EQ.subj=subj;EQ.qNum=0;
+  $("#eqTitle").textContent=subj.label.toUpperCase();
+  eqNextQuestion();
+}
+
+function eqNextQuestion(){
+  EQ.qNum++;EQ.busy=false;
+  const inn=$("#eqInner");
+  const _gr=S.s.greekStudent;
+  inn.innerHTML=`<div class="eq-qnum">${_gr?`Ερώτηση ${EQ.qNum}`:`Question ${EQ.qNum}`}</div><div class="eq-qtext" id="eqQText"><span style="opacity:.45">${_gr?"Φορτώνω ερώτηση…":"Loading question…"}</span></div><div class="eq-ans-wrap" id="eqAnsWrap" style="display:none"><textarea class="eq-ans" id="eqAns" placeholder="${_gr?"Γράψε την απάντησή σου…":"Write your answer…"}" rows="3"></textarea><button class="eq-submit" id="eqSubmitBtn">${_gr?"Απάντηση →":"Submit →"}</button></div>`;
+
+  let sysP,tags=[];
+  if(S.s.greekStudent){
+    const grade=S.profile?.grade;
+    const gradeLabel=grade?eqGradeLabel(grade):"Γυμνάσιο/Λύκειο";
+    const books=eqGetGradeBooks(grade,EQ.subj.label);
+    const recent=eqMineTopics(EQ.subj);
+    sysP=`Είσαι εξεταστής για Ελληνικό σχολείο.\nΤάξη μαθητή: ${gradeLabel}\nΜάθημα: ${EQ.subj.label}`;
+    if(books)sysP+=`\nΣχολικά βιβλία τάξης: ${books}`;
+    if(recent)sysP+=`\nΘέματα που έχει ήδη μελετήσει ο μαθητής: ${recent}`;
+    sysP+=`\n\nΔώσε ΜΙΑ ΜΟΝΟ εξεταστική ερώτηση κατάλληλη για αυτή την τάξη.${recent?" Εστίασε σε θέματα από τη μελέτη του αν υπάρχουν.":""} Γράψε ΜΟΝΟ την ερώτηση, τίποτα άλλο. Γλώσσα: ελληνικά.`;
+    if(grade)tags.push(gradeLabel);
+    if(recent)tags.push("βασισμένο στη μελέτη σου");
+  } else {
+    const topic=EQ.topicHint||"";
+    if(topic){
+      // Topic given: ignore all notes — generate exactly what the user asked for
+      sysP=`You are a quiz generator. Generate ONE exam-style question about "${topic}" (subject: ${EQ.subj.label}). Keep it clear and at an appropriate academic level. Write ONLY the question, nothing else.`;
+      tags.push(topic);
+    } else {
+      // No topic: mine notes but filter to only actual study/homework content (skip short messages)
+      const notes=eqMineAllTopics();
+      if(notes){
+        sysP=`You are a quiz generator. Subject: ${EQ.subj.label}.\n\nThe student's recent study notes and homework sessions:\n${notes}\n\nGenerate ONE exam-style question about a concept from the notes above. Write ONLY the question, nothing else.`;
+        tags.push("from your notes");
+      } else {
+        sysP=`You are a quiz generator. Generate ONE exam-style question for the subject: ${EQ.subj.label}. Keep it at a general academic level. Write ONLY the question, nothing else.`;
+      }
+    }
+  }
+
+  if(tags.length){
+    const hint=document.createElement("div");hint.style.cssText="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px";
+    tags.forEach(t=>{const sp=document.createElement("span");sp.className="eq-context-tag";sp.textContent=t;hint.appendChild(sp);});
+    inn.insertBefore(hint,inn.querySelector(".eq-qtext"));
+  }
+
+  eqStream(sysP,S.s.greekStudent?"Μία ερώτηση παρακαλώ.":"Give me a question.",$("#eqQText"),(q)=>{
+    EQ.currentQ=q;
+    const wrap=$("#eqAnsWrap");if(!wrap)return;
+    wrap.style.display="flex";
+    const ta=$("#eqAns"),btn=$("#eqSubmitBtn");
+    if(btn)btn.onclick=eqSubmitAnswer;
+    if(ta){
+      ta.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();eqSubmitAnswer();}};
+      setTimeout(()=>ta.focus(),50);
+    }
+  });
+}
+
+async function eqSubmitAnswer(){
+  if(EQ.busy)return;
+  const ta=$("#eqAns"),btn=$("#eqSubmitBtn");
+  if(!ta||!ta.value.trim()){toast(S.s.greekStudent?"Γράψε μια απάντηση πρώτα.":"Write an answer first.",2000);return;}
+  EQ.busy=true;
+  const answer=ta.value.trim();
+  EQ.total++;
+  if(btn){btn.disabled=true;btn.textContent=S.s.greekStudent?"Ελέγχω…":"Checking…";}
+  const inn=$("#eqInner");
+  const wrap=$("#eqAnsWrap");if(wrap)wrap.remove();
+
+  const resultDiv=document.createElement("div");
+  resultDiv.className="eq-result";
+  const verdictEl=document.createElement("div");verdictEl.className="eq-verdict";verdictEl.textContent="…";
+  const explanEl=document.createElement("div");explanEl.className="eq-explanation";
+  resultDiv.append(verdictEl,explanEl);
+  inn.appendChild(resultDiv);
+
+  const gr=S.s.greekStudent;
+  const grade=S.profile?.grade;
+  const gradeLabel=grade?eqGradeLabel(grade):"Γυμνάσιο/Λύκειο";
+  const sysP=gr
+    ?`Είσαι εξεταστής για ${gradeLabel}. Αξιολόγησε την απάντηση μαθητή στο μάθημα ${EQ.subj.label}.\nΕρώτηση: ${EQ.currentQ}\nΑπάντηση μαθητή: ${answer}\n\nΞεκίνα ακριβώς με "ΣΩΣΤΟ" ή "ΛΑΘΟΣ" (μία λέξη), μετά νέα γραμμή και σύντομη εξήγηση στα ελληνικά (2-3 προτάσεις).`
+    :`You are a quiz grader. Subject: ${EQ.subj.label}.\nQuestion: ${EQ.currentQ}\nStudent's answer: ${answer}\n\nStart with exactly "CORRECT" or "INCORRECT" (one word only), then a new line with a brief explanation in 2-3 sentences.`;
+  const evalMsg=gr?"Αξιολόγηση.":"Grade this answer.";
+  const CORRECT=gr?"ΣΩΣΤΟ":"CORRECT";const INCORRECT=gr?"ΛΑΘΟΣ":"INCORRECT";
+  await eqStream(sysP,evalMsg,explanEl,(full)=>{
+    const lines=full.split("\n");
+    const first=(lines[0]||"").trim().toUpperCase();
+    const isCorrect=first===CORRECT;
+    if(isCorrect){EQ.correct++;resultDiv.classList.add("correct");verdictEl.textContent=gr?"✓ ΣΩΣΤΟ":"✓ Correct";}
+    else{resultDiv.classList.add("wrong");verdictEl.textContent=gr?"✗ ΛΑΘΟΣ":"✗ Incorrect";}
+    if(first===CORRECT||first===INCORRECT)explanEl.textContent=lines.slice(1).join("\n").trim();
+    eqUpdateScore();
+
+    const nextBtn=document.createElement("button");
+    nextBtn.className="eq-next";nextBtn.textContent=gr?"Επόμενη ερώτηση →":"Next question →";
+    nextBtn.onclick=eqNextQuestion;
+    inn.appendChild(nextBtn);
+
+    const changeBtn=document.createElement("button");
+    changeBtn.className="eq-change";changeBtn.textContent=gr?"Αλλαγή μαθήματος":"Change subject";
+    changeBtn.onclick=()=>{
+      if(EQ.total>=2){
+        eqShowSummary(()=>{Object.assign(EQ,{correct:0,total:0,qNum:0,topicHint:""});$("#eqScore").style.display="none";if(gr)eqRenderPick();else eqRenderPickEN();});
+      } else {
+        Object.assign(EQ,{correct:0,total:0,qNum:0,topicHint:""});
+        $("#eqScore").style.display="none";
+        if(gr)eqRenderPick();else eqRenderPickEN();
+      }
+    };
+    inn.appendChild(changeBtn);
+  });
+}
+
+function eqShowSummary(onDone){
+  const gr=S.s.greekStudent;
+  const pct=EQ.total>0?Math.round((EQ.correct/EQ.total)*100):0;
+  const mark=pct>=80?"✦":pct>=50?"◌":"◎";
+  const inn=$("#eqInner");
+  $("#eqTitle").textContent=gr?"ΑΠΟΤΕΛΕΣΜΑ":"RESULT";
+  inn.innerHTML=`<div style="text-align:center;padding:24px 0 16px">
+    <div style="font:400 44px 'Cinzel',serif;color:var(--gold);margin-bottom:6px">${mark}</div>
+    <div style="font:700 38px 'Cinzel',serif;color:var(--text);letter-spacing:1px;margin-bottom:6px">${EQ.correct}<span style="font-size:22px;color:var(--text3)"> / ${EQ.total}</span></div>
+    <div style="font:500 13px 'Inter',sans-serif;color:var(--text3);margin-bottom:6px">${pct}% ${gr?"σωστές απαντήσεις":"correct"}</div>
+    <div style="font:700 9px 'Cinzel',serif;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:28px">${(EQ.subj?.label||"").toUpperCase()}</div>
+    <button class="auth-submit" style="max-width:200px;margin:0 auto;display:block" id="eqSumDone">${gr?"Τέλος":"Done"}</button>
+  </div>`;
+  setTimeout(()=>{const b=$("#eqSumDone");if(b)b.onclick=onDone;},30);
+}
+
+async function eqStream(systemMsg,userMsg,elTarget,onDone){
+  const msgs=[{role:"system",content:systemMsg},{role:"user",content:userMsg}];
+  let full="";
+  try{
+    const res=await fetch("/api/chat",{method:"POST",headers:apiHeaders(),body:JSON.stringify({model:S.model,messages:msgs,student_mode:!!S.s.greekStudent})});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const reader=res.body.getReader();const dec=new TextDecoder();let buf="";
+    while(true){
+      const{done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n");buf=lines.pop()||"";
+      for(const ln of lines){
+        if(!ln.trim())continue;
+        let o;try{o=JSON.parse(ln)}catch{continue}
+        if(o._type)continue;
+        if(o.message?.content){full+=o.message.content;if(elTarget)elTarget.textContent=full;}
+      }
+    }
+    if(onDone)onDone(full);
+  }catch(e){
+    if(elTarget)elTarget.textContent=S.s.greekStudent?"Σφάλμα σύνδεσης. Δοκίμασε ξανά.":"Connection error. Try again.";
+    if(onDone)onDone(full);
+  }
+}
+
+function bindSetup() {
+  async function doSetup() {
+    const err = $("#setupNameErr"); err.textContent = "";
+    const name = $("#setupNameInput").value.trim();
+    if (!name) { err.textContent = "Please enter your name."; return; }
+    const btn = $("#setupNameBtn");
+    btn.disabled = true;
+    btn.textContent = "Setting up…";
+    try {
+      const r = await fetch("/api/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      if (r.ok) {
+        const tag = $("#setupTagline");
+        if (tag) tag.textContent = "Welcome, " + name.split(" ")[0] + " ✦";
+        await new Promise(r => setTimeout(r, 600));
+        applyServerState(await loadFromServer());
+        $("#setupScreen").remove();
+        afterAuth();
+      } else {
+        err.textContent = "Setup failed. Try again.";
+        btn.disabled = false;
+        btn.textContent = "Get started";
+      }
+    } catch {
+      err.textContent = "Connection error.";
+      btn.disabled = false;
+      btn.textContent = "Get started";
+    }
+  }
+  const btn = $("#setupNameBtn");
+  if (btn) btn.onclick = doSetup;
+  const inp = $("#setupNameInput");
+  if (inp) inp.onkeydown = e => { if (e.key === "Enter") doSetup(); };
+  setTimeout(() => { if (inp) inp.focus(); }, 100);
+}
+
+function afterAuth(){
+  applyI18n();setSub();renderWord();renderChip();renderSubjBar();
+  if(!S.threads.length)newThread();
+  else{if(!S.aid||!S.threads.find(t=>t.id===S.aid))S.aid=S.threads[0].id;renderThreads();renderMsgs()}
+  renderSettings();bindSettings();bindAll();bindKill();bindModelRetry();loadModels();
+  applyGreekStudent(!!S.s.greekStudent);
+  buildSearchIndex(); bindSearch();
+  bindWalkthrough();
+  setInterval(setSub,8*60*1000);
+  setTimeout(checkTunnel,3000);
+  setInterval(checkTunnel,30000);
+  if(!S.profile?.quizDone) setTimeout(()=>showQuiz(startWalkthrough),400);
+  else startWalkthrough();
+}
+
+async function init(){
+  try {
+    const sr = await fetch("/api/status");
+    if (sr.ok) {
+      const { has_account } = await sr.json();
+      if (!has_account) {
+        const scr = $("#setupScreen");
+        if (scr) scr.style.display = "flex";
+        bindSetup();
+        return;
+      }
+    }
+  } catch {}
+  applyServerState(await loadFromServer());
+  afterAuth();
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+NOEMA.app/
+graphify-out/
+build/
+dist/
+__pycache__/
+*.spec
