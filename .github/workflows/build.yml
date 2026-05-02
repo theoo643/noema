@@ -53,8 +53,24 @@ jobs:
           pip install pyinstaller pywebview pillow
           pip install -r requirements.txt
 
+      - name: Convert icon to .ico
+        run: |
+          python -c "
+          from PIL import Image
+          import struct, zlib
+
+          img = Image.open('noema.icns')
+          sizes = [16, 32, 48, 64, 128, 256]
+          imgs = []
+          for s in sizes:
+              imgs.append(img.resize((s, s), Image.LANCZOS))
+          imgs[0].save('noema.ico', format='ICO', sizes=[(s, s) for s in sizes], append_images=imgs[1:])
+          print('Icon converted successfully')
+          "
+        shell: pwsh
+
       - name: Build
-        run: pyinstaller NOEMA_win.spec
+        run: pyinstaller NOEMA_win.spec --icon=noema.ico
 
       - name: Zip
         run: Compress-Archive -Path dist\NOEMA -DestinationPath NOEMA-Windows.zip

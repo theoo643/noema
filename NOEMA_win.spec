@@ -44,7 +44,6 @@ exe = EXE(
     strip=False,
     upx=False,
     console=False,
-    icon='noema.icns',
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
